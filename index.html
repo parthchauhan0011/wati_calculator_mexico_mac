@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp cost estimator — Mexico — Wati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  /* Wati brand tokens — wati.io/branding
+     Green #00e785 · Blue #4fc3ff · Yellow #ffe96e · Pink #f9b4ff
+     Tints  #cafde8 ·      #e3f5ff ·       #fff6da ·      #fdecff
+     Black #1d1d1d · White #ffffff · Type DM Sans                     */
+  :root{
+    --green:#00e785;  --green-soft:#cafde8;
+    --blue:#4fc3ff;   --blue-soft:#e3f5ff;
+    --yellow:#ffe96e; --yellow-soft:#fff6da;
+    --pink:#f9b4ff;   --pink-soft:#fdecff;
+    --black:#1d1d1d;  --ink-soft:#4c514f; --muted:#7a827f;
+    --page:#f7faf9;   --card:#ffffff;
+    --rule:#e4e9e7;   --rule-soft:#eef2f0;
+    --warn:#b23a2e;   --on-warn:#ffffff;
+    --on-ink:#ffffff;                       /* text on a --black surface      */
+    --on-brand:#14211d;                     /* text on a solid brand colour   */
+    --hair:rgba(29,29,29,.07);              /* faint internal rules           */
+    --hair-2:rgba(29,29,29,.16);
+    --sunken:rgba(29,29,29,.05);            /* inset tracks and disabled wells*/
+    --wash:rgba(255,255,255,.55);           /* translucent panel on a tint    */
+    --wash-2:rgba(255,255,255,.75);
+    --totals-bg:#fbfdfc;
+    --logo-filter:none;
+    --shadow:0 1px 2px rgba(29,29,29,.04), 0 18px 40px -28px rgba(29,29,29,.28);
+    --font:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+
+  /* Dark mode, opt-in only. Brand accents keep their hue; the tints become deep
+     versions of themselves so the colour coding still reads. */
+  :root[data-theme="dark"] {
+    --green-soft:#0c3a2b; --blue-soft:#0d2b3a;
+    --yellow-soft:#39331a; --pink-soft:#321f39;
+    --black:#eef3f1;  --ink-soft:#c2ccc8; --muted:#8c9794;
+    --page:#0d1211;   --card:#151b19;
+    --rule:#28312e;   --rule-soft:#1d2422;
+    --warn:#e3705f;   --on-warn:#1a0f0d;
+    --on-ink:#0e1413;
+    --on-brand:#14211d;
+    --hair:rgba(255,255,255,.10);
+    --hair-2:rgba(255,255,255,.20);
+    --sunken:rgba(255,255,255,.07);
+    --wash:rgba(255,255,255,.06);
+    --wash-2:rgba(255,255,255,.09);
+    --totals-bg:#111715;
+    --logo-filter:brightness(0) invert(1);
+    --shadow:0 1px 2px rgba(0,0,0,.40), 0 18px 40px -28px rgba(0,0,0,.80);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--page);color:var(--black);font-family:var(--font);
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.12}
+  .num{font-variant-numeric:tabular-nums}
+  a{color:var(--black);text-decoration:none;border-bottom:2px solid var(--green);padding-bottom:1px}
+  a:hover{background:var(--green-soft)}
+  a:focus-visible{outline:2px solid var(--black);outline-offset:2px;border-radius:2px}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 22px}
+  .label{font-size:11.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+  /* topbar */
+  .topbar{background:var(--card);border-bottom:1px solid var(--rule)}
+  .topbar-in{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:15px 22px;max-width:1200px;margin:0 auto;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+  .brand img{height:26px;display:block;filter:var(--logo-filter)}
+  .brand .divider{width:1px;height:20px;background:var(--rule)}
+  .brand .toolname{font-weight:500;font-size:.94rem}
+  .regionpill{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;
+    background:var(--yellow);color:var(--on-brand);white-space:nowrap}
+  .cycle{display:flex;background:var(--green-soft);border-radius:999px;padding:3px}
+  .cycle button{font-family:var(--font);font-size:13px;font-weight:500;padding:7px 16px;border:0;
+    background:transparent;color:var(--ink-soft);cursor:pointer;border-radius:999px}
+  .cycle button[aria-pressed="true"]{background:var(--green);color:var(--on-brand);font-weight:700}
+  .cycle button:focus-visible{outline:2px solid var(--black);outline-offset:1px}
+
+  .masthead{padding:46px 0 6px}
+  .masthead h1{font-size:clamp(2rem,5vw,3.3rem);max-width:23ch}
+  .masthead h1 mark{background:var(--green-soft);color:var(--black);padding:0 .12em;border-radius:4px}
+  .lede{margin:18px 0 0;max-width:62ch;color:var(--ink-soft);font-size:1.05rem}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:46px;align-items:start;padding:28px 0 60px}
+  @media (max-width:980px){ .split{grid-template-columns:minmax(0,1fr);gap:30px} }
+
+  /* questions */
+  .q{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:20px 22px 22px;margin:0}
+
+  /* Two-up where the content allows, so the form is a screen or two, not six. */
+  #form{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  #form > .q{grid-column:1/-1}
+  #form > .q.half{grid-column:span 1}
+  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+  .ao-grid{display:grid;grid-template-columns:1fr;gap:0 28px}
+  :root[data-detail="off"] .ao-grid{grid-template-columns:1fr}
+  /* One line per add-on in the compact view: name, help link, quantity. */
+  :root[data-detail="off"] .ao-grid .field{margin-bottom:7px}
+  :root[data-detail="off"] .ao-grid .check{padding:6px 0}
+  :root[data-detail="off"] .ao-grid .field-label.stack{flex-direction:row;align-items:center;
+    gap:9px;max-width:none}
+  .ao-grid .check > div{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:9px}
+  .ao-grid .check > div .hint{flex-basis:100%}
+  :root[data-detail="off"] .rc-file{display:none}
+  .ao-incl{color:var(--muted)}
+  .ao-link{font-size:.8rem;font-weight:500;color:var(--muted);white-space:nowrap;
+    text-decoration:underline;text-decoration-color:var(--green);text-underline-offset:3px}
+  .ao-link:hover{color:var(--black)}
+  .ao-grid .check{border-top:0;padding:9px 0}
+  @media (max-width:1180px){
+    #form{grid-template-columns:1fr}
+    #form > .q.half{grid-column:1/-1}
+    .vgrid,.ao-grid{grid-template-columns:1fr}
+  }
+
+  /* Details off is the working view: prose hidden, rhythm tightened. */
+  :root[data-detail="off"] .q-note,
+  :root[data-detail="off"] .aibox,
+  :root[data-detail="off"] .freebox,
+  :root[data-detail="off"] .scale,
+  :root[data-detail="off"] .hint.ex,
+  :root[data-detail="off"] .notes,
+  :root[data-detail="off"] .chan-n{display:none}
+  :root[data-detail="off"] .lede{display:none}
+  :root[data-detail="off"] .masthead h1{font-size:clamp(1.6rem,3.2vw,2.3rem);max-width:30ch}
+  :root[data-detail="off"] .masthead{padding-top:26px;padding-bottom:4px}
+  :root[data-detail="off"] .channels{margin-top:16px}
+  :root[data-detail="off"] .q{padding:15px 20px 17px}
+  :root[data-detail="off"] .field{margin-bottom:13px}
+  :root[data-detail="off"] .s-head{margin-bottom:12px}
+  :root[data-detail="off"] .freebox{padding:13px 16px}
+  :root[data-detail="off"] .chan-in{padding:11px 16px}
+  .q-head{display:flex;align-items:center;gap:11px;margin-bottom:7px}
+  .q-num{width:24px;height:24px;border-radius:50%;background:var(--green);color:var(--on-brand);
+    font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+  .q h2{font-size:1.22rem}
+  .q-note{color:var(--muted);font-size:.9rem;margin:6px 0 18px;max-width:64ch}
+
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{font-family:var(--font);font-size:.9rem;font-weight:500;padding:9px 16px;
+    border:1.5px solid var(--rule);background:var(--card);border-radius:999px;cursor:pointer;
+    color:var(--ink-soft);transition:.14s}
+  .chip[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--black)}
+  .chip:hover{border-color:var(--green)}
+  .chip:focus-visible{outline:2px solid var(--black);outline-offset:2px}
+
+  .field{margin-bottom:17px}
+  .field:last-child{margin-bottom:0}
+  .field-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:8px}
+  .field-label{font-weight:500;font-size:.97rem;display:flex;align-items:center;gap:9px}
+  .field-label.stack{flex-direction:column;align-items:flex-start;gap:0;max-width:46ch}
+  .dot{width:10px;height:10px;border-radius:3px;flex:none}
+  .d-mkt{background:var(--blue)} .d-util{background:var(--green)} .d-auth{background:var(--pink)}
+  .hint{color:var(--muted);font-size:.83rem;font-weight:400;margin-top:3px;display:block}
+  input[type=number]{font-family:var(--font);font-size:.95rem;font-weight:500;width:118px;padding:8px 11px;
+    text-align:right;border:1.5px solid var(--rule);border-radius:9px;background:var(--card);
+    color:var(--black);font-variant-numeric:tabular-nums}
+  input[type=number].narrow{width:86px}
+  input[type=number]:focus-visible{outline:0;border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  select{font-family:var(--font);font-size:1rem;font-weight:500;width:100%;max-width:360px;
+    padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;background:var(--card);
+    color:var(--black);cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%231d1d1d' stroke-width='1.8' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center}
+  select:focus-visible{outline:0;border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;cursor:pointer;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;background:var(--rule);border-radius:99px}
+  input[type=range]::-moz-range-track{height:5px;background:var(--rule);border-radius:99px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;
+    border-radius:50%;background:var(--card);border:3px solid var(--green);margin-top:-8px;
+    box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--card);border:3px solid var(--green)}
+  input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--black);outline-offset:2px}
+  input[type=range].r-mkt::-webkit-slider-thumb{border-color:var(--blue)}
+  input[type=range].r-auth::-webkit-slider-thumb{border-color:var(--pink)}
+  .scale{display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:var(--muted);margin-top:1px}
+
+  .check{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--rule-soft)}
+  .check input[type=checkbox]{margin:4px 0 0;width:17px;height:17px;accent-color:var(--green);flex:none}
+  .check label{font-size:.94rem;font-weight:500}
+
+  .cards{margin-top:15px;padding-top:14px;border-top:1px solid var(--rule-soft)}
+  .cards h4{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 9px}
+  .cards ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+  .cards a{display:inline-flex;align-items:center;gap:7px;font-size:.86rem;font-weight:500;
+    padding:7px 13px;border:1.5px solid var(--rule);border-radius:999px;background:var(--card);
+    color:var(--black);text-decoration:none}
+  .cards a:hover{border-color:var(--green);background:var(--green-soft)}
+  .cards a::before{content:"\1F4C4";font-size:13px}
+  .cards a span{color:var(--muted);font-weight:400}
+  .cards p{margin:9px 0 0;font-size:.8rem;color:var(--muted)}
+  .aibox{background:var(--blue-soft);border-radius:11px;padding:16px 18px;margin-top:20px}
+  .aibox h3{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .aibox ul{margin:11px 0 0;padding-left:18px;font-size:.88rem}
+  .aibox li{margin-bottom:6px}
+  .aibox li:last-child{margin-bottom:0}
+  .aibox p{margin:12px 0 0;font-size:.86rem}
+  .freebox{background:var(--green-soft);border-radius:11px;padding:16px 18px;margin-top:20px}
+  .freebox h3{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .freebox ul{margin:11px 0 0;padding-left:18px;font-size:.88rem}
+  .freebox li{margin-bottom:5px}
+  .freebox li:last-child{margin-bottom:0}
+
+  .fxline{font-size:.83rem;color:var(--muted);margin-top:11px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .fxline b{color:var(--black);font-weight:700;font-variant-numeric:tabular-nums}
+  .fxline button{font-family:var(--font);font-size:12px;font-weight:700;border:1.5px solid var(--rule);
+    background:var(--card);border-radius:999px;padding:3px 11px;cursor:pointer}
+  .fxline button:hover{border-color:var(--green);background:var(--green-soft)}
+  .fxbad{color:var(--warn);font-weight:500}
+
+  /* receipt */
+  /* The quote panel scrolls inside its own column so the whole receipt stays
+     reachable on a short screen, with the headline total pinned to the bottom. */
+  .rcol{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow-y:auto;
+    overscroll-behavior:contain;scrollbar-width:thin}
+  .rcol .totals{position:sticky;bottom:0;z-index:2;
+    box-shadow:0 -8px 18px -12px rgba(0,0,0,.30)}
+  @media (max-width:980px){
+    .rcol{position:static;max-height:none;overflow:visible}
+    .rcol .totals{position:static;box-shadow:none}
+  }
+  .receipt{background:var(--card);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .r-head{padding:22px 24px 18px;background:var(--green-soft)}
+  .r-head h2{font-size:1.6rem;margin-top:6px}
+  .bar-right{display:flex;align-items:center;gap:10px}
+  .ctrlbar{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+  /* Sticks to the top of the quote column so it stays by the number it governs. */
+  .ctrlslot:not(:empty){position:sticky;top:0;z-index:3;background:var(--page);
+    padding-bottom:10px;margin-bottom:-2px}
+  /* Each control is a labelled field, so nothing relies on an icon being guessed. */
+  .ctrl{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .ctrl[hidden]{display:none}
+  .ctrl-l{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted);white-space:nowrap;padding-left:2px}
+  .selwrap{position:relative;display:flex;align-items:center}
+  .selwrap::after{content:"";position:absolute;right:11px;width:7px;height:7px;
+    border-right:1.8px solid var(--black);border-bottom:1.8px solid var(--black);
+    transform:translateY(-2px) rotate(45deg);pointer-events:none;opacity:.7}
+  .selwrap select{appearance:none;-webkit-appearance:none;font-family:var(--font);
+    font-size:13px;font-weight:700;color:var(--black);background:var(--card);
+    border:1.5px solid var(--hair-2);border-radius:10px;padding:7px 28px 7px 11px;
+    cursor:pointer;max-width:200px;width:100%;transition:border-color .16s, box-shadow .16s}
+  .selwrap select:hover{border-color:var(--black)}
+  .selwrap select:focus-visible{outline:0;border-color:var(--black);
+    box-shadow:0 0 0 3px var(--green-soft)}
+  @media (max-width:640px){ .selwrap select{font-size:12px;max-width:none;width:auto;padding:6px 26px 6px 9px} }
+
+  /* Dark mode reads as a switch, so it is obvious it toggles back. */
+  .switch{position:relative;width:54px;height:30px;flex:none;padding:0;cursor:pointer;
+    border:1.5px solid var(--hair-2);border-radius:999px;background:var(--sunken);
+    transition:background .22s ease, border-color .22s ease}
+  .switch[aria-checked="true"]{background:var(--green);border-color:var(--green)}
+  .switch .knob{position:absolute;top:2px;left:2px;width:23px;height:23px;border-radius:50%;
+    background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.25);display:flex;
+    align-items:center;justify-content:center;transition:transform .22s cubic-bezier(.4,1.4,.5,1)}
+  .switch[aria-checked="true"] .knob{transform:translateX(24px)}
+  .switch svg{width:13px;height:13px;fill:none;stroke:var(--black);stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round}
+  .switch .i-moon,.switch[aria-checked="true"] .i-sun{display:none}
+  .switch[aria-checked="true"] .i-moon{display:block}
+  .switch:focus-visible{outline:2px solid var(--black);outline-offset:2px}
+  .ctrlbar .cycle{margin-top:1px}
+  .r-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .ccybox select{font-family:var(--font);font-size:12px;font-weight:700;color:var(--black);
+    background:var(--wash-2);border:1.5px solid var(--black);border-radius:999px;
+    padding:4px 9px;cursor:pointer;max-width:210px}
+  .ccybox select:focus-visible{outline:2px solid var(--black);outline-offset:2px}
+  .grand-alt{display:block;font-size:12.5px;font-weight:600;color:var(--muted);
+    margin-top:3px;font-variant-numeric:tabular-nums}
+  .disc{padding:13px 17px 0;border-top:1px solid var(--hair)}
+  .disc label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .disc-in{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .disc-in .num{width:74px}
+  .disc-pct{font-weight:700;font-size:14px;margin-left:-4px}
+  .disc-note{font-size:11.5px;color:var(--muted);line-height:1.3;flex:1 1 100%}
+  .disc-rows{margin-top:9px;border-top:1px solid var(--hair)}
+  .drow.fixed .dlab,.drow.fixed .damt{opacity:.55}
+  .drow.fixed .num{background:var(--sunken);color:var(--muted);cursor:not-allowed}
+  .drow{display:flex;align-items:center;gap:8px;padding:6px 0;
+    border-bottom:1px solid var(--hair)}
+  .drow .dlab{flex:1;font-size:12.5px;line-height:1.3}
+  .drow .damt{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .drow .num{width:58px;padding:4px 6px;font-size:12.5px;text-align:right}
+  .drow .dpc{font-size:12px;color:var(--muted)}
+  .disc-out{margin-top:10px;font-size:13px;line-height:1.5;background:var(--green-soft);
+    border-radius:10px;padding:9px 12px}
+  .disc-out b{font-weight:700}
+  .disc-out .was{text-decoration:line-through;opacity:.55}
+  .planpick{display:flex;gap:5px;margin-top:13px;background:var(--wash);
+    border-radius:999px;padding:4px}
+  .planpick button{flex:1;font-family:var(--font);font-size:12px;font-weight:600;padding:6px 4px;
+    border:0;background:transparent;color:var(--ink-soft);cursor:pointer;border-radius:999px;white-space:nowrap}
+  .planpick button[aria-pressed="true"]{background:var(--black);color:var(--on-ink)}
+  .planpick button:focus-visible{outline:2px solid var(--black);outline-offset:1px}
+  .planpick button{display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.2}
+  .planpick small{font-size:10.5px;font-weight:700;opacity:.6;font-variant-numeric:tabular-nums}
+  .planpick button[aria-pressed="true"] small{opacity:.85}
+  .planpick small.no{text-decoration:line-through;opacity:.45}
+  .pinned{background:var(--yellow);color:var(--on-brand);font-size:12px;font-weight:500;
+    padding:10px 24px;line-height:1.45}
+  .pinned[hidden]{display:none}
+  .pinned b{font-weight:700}
+  .verdict{margin:11px 0 0;font-size:.88rem;color:var(--ink-soft)}
+  .verdict b{color:var(--black);font-weight:700}
+  .warnbar{background:var(--warn);color:var(--on-warn);font-size:12px;font-weight:500;padding:9px 24px;line-height:1.4}
+  .warnbar[hidden]{display:none}
+  .lines{padding:4px 24px}
+  .ghead{font-size:10.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding:16px 0 7px}
+  .line{display:grid;grid-template-columns:1fr auto;gap:12px;padding:9px 0;border-top:1px solid var(--rule-soft);align-items:baseline}
+  .l-name{font-size:.92rem;font-weight:500}
+  .l-sub{display:block;font-size:11.5px;font-weight:400;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+  .l-amt{font-size:.95rem;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .line.free .l-amt{color:var(--muted)}
+  .line.extra .l-name::after{content:"add-on";font-size:9px;font-weight:700;letter-spacing:.07em;
+    text-transform:uppercase;background:var(--yellow-soft);color:#7a6410;border-radius:3px;
+    padding:2px 5px;margin-left:7px;vertical-align:1.5px}
+  .stot{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 0 13px;margin-top:2px;
+    border-top:1.5px solid var(--rule);font-size:.88rem;font-weight:500;color:var(--ink-soft)}
+  .stot .v{color:var(--black);font-weight:700;font-variant-numeric:tabular-nums}
+  .totals{padding:18px 24px 22px;border-top:1px solid var(--rule);background:var(--totals-bg)}
+  .grand{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .grand .l{font-weight:700;font-size:1rem}
+  .grand .l small{display:block;font-size:11px;font-weight:500;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);margin-top:3px}
+  .grand .v{font-weight:700;font-size:2rem;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+  .grand .v.pulse{animation:pop .26s ease-out}
+  @keyframes pop{from{transform:translateY(-3px);opacity:.5}to{transform:none;opacity:1}}
+
+  /* ---------- channels band ------------------------------------------- */
+  .channels{margin-top:26px}
+  .chan-in{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:flex-start;
+    background:var(--card);border:1.5px solid var(--rule);border-radius:16px;
+    padding:15px 18px;box-shadow:var(--shadow)}
+  .chan-g{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .chan-t{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0}
+  .chips li{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    color:var(--black);background:var(--green-soft);border-radius:999px;padding:5px 11px 5px 8px;
+    transition:transform .18s cubic-bezier(.4,1.4,.5,1)}
+  .chips li:hover{transform:translateY(-2px)}
+  .chips.paid li{background:var(--yellow-soft)}
+  .chips svg{width:14px;height:14px;flex:none;fill:none;stroke:var(--black);
+    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .chan-n{margin:9px 2px 0;font-size:12.5px;color:var(--muted);max-width:78ch}
+  @media (max-width:640px){ .chan-in{gap:12px} }
+
+  /* ---------- live message mix ---------------------------------------- */
+  .mix{margin-top:18px;padding-top:15px;border-top:1.5px solid var(--rule-soft)}
+  .mix-t{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .mix-t b{font-size:13px;letter-spacing:0;text-transform:none;color:var(--black);
+    font-variant-numeric:tabular-nums}
+  .mixbar{display:flex;height:14px;border-radius:99px;overflow:hidden;margin:9px 0 9px;
+    background:var(--sunken)}
+  .mixbar i{display:block;height:100%;transition:width .35s cubic-bezier(.3,.8,.3,1)}
+  .mixlegend{display:flex;flex-wrap:wrap;gap:5px 14px;font-size:11.5px;color:var(--muted)}
+  .mixlegend span{display:flex;align-items:center;gap:5px}
+  .mixlegend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+  .mixlegend b{color:var(--black);font-variant-numeric:tabular-nums}
+  .mix-free{color:var(--muted);font-style:italic}
+
+  /* ---------- motion --------------------------------------------------- */
+  @media (prefers-reduced-motion: no-preference){
+    .q{transition:box-shadow .25s ease, border-color .25s ease, transform .25s ease}
+    .q:focus-within{border-color:var(--hair-2);box-shadow:var(--shadow)}
+    .reveal{opacity:0;transform:translateY(14px)}
+    .reveal.in{opacity:1;transform:none;transition:opacity .5s ease, transform .5s cubic-bezier(.2,.7,.3,1)}
+    .cards a,.btn,.usecase button,.planpick button,.cycle button{transition:transform .16s
+      cubic-bezier(.4,1.4,.5,1), background-color .18s ease, color .18s ease, box-shadow .18s ease}
+    .cards a:hover,.btn:hover{transform:translateY(-2px)}
+    .btn:active,.usecase button:active,.planpick button:active{transform:translateY(1px)}
+    .line{animation:lineIn .3s cubic-bezier(.2,.8,.3,1) both}
+    @keyframes lineIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+    #grand,#grandAlt{transition:color .2s ease}
+    .bump{animation:bump .36s cubic-bezier(.3,1.5,.5,1)}
+    @keyframes bump{0%{transform:scale(1)}38%{transform:scale(1.055)}100%{transform:scale(1)}}
+    .comp i{transition:width .35s cubic-bezier(.3,.8,.3,1)}
+    .addon-row{transition:background-color .18s ease}
+  }
+  #grand{display:inline-block;transform-origin:right center}
+  .comp{display:flex;height:8px;border-radius:99px;overflow:hidden;margin:18px 0 10px;background:var(--rule-soft)}
+  .comp i{display:block;height:100%;transition:width .2s ease}
+  .clegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;font-weight:500;color:var(--muted)}
+  .clegend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:5px}
+  .clegend b{color:var(--black);font-weight:700}
+  .unit{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11.5px;
+    font-weight:500;color:var(--muted);padding:13px 24px;border-top:1px solid var(--rule-soft)}
+  .unit b{color:var(--black);font-weight:700;font-variant-numeric:tabular-nums}
+  .acts{display:flex;gap:9px;padding:0 24px 22px}
+  .btn{font-family:var(--font);font-size:13px;font-weight:700;padding:12px 14px;
+    border:1.5px solid var(--black);background:var(--card);color:var(--black);cursor:pointer;
+    border-radius:999px;flex:1}
+  .btn:hover{background:var(--green-soft);border-color:var(--green)}
+  .btn:focus-visible{outline:2px solid var(--black);outline-offset:2px}
+  .btn.pri{background:var(--green);border-color:var(--green)}
+  .btn.pri:hover{background:var(--black);color:var(--on-ink);border-color:var(--black)}
+
+  /* plans */
+  .section{padding:44px 0 10px;border-top:1px solid var(--rule)}
+  .s-head{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;flex-wrap:wrap;margin-bottom:26px}
+  .section h2{font-size:clamp(1.5rem,3vw,2.1rem);max-width:26ch}
+  .s-head p{margin:0;max-width:44ch;color:var(--muted);font-size:.92rem}
+  .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  @media (max-width:840px){ .plans{grid-template-columns:1fr} }
+  .plan{border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:13px;border:1.5px solid transparent}
+  .plan.growth{background:var(--blue-soft)}
+  .plan.pro{background:var(--green-soft)}
+  .plan.business{background:var(--pink-soft)}
+  .plan.growth.best{border-color:var(--blue)}
+  .plan.pro.best{border-color:var(--green)}
+  .plan.business.best{border-color:var(--pink)}
+  .plan.out{background:var(--card);border:1.5px dashed var(--rule);color:var(--muted)}
+  .p-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .plan h3{font-size:1.3rem}
+  .tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;
+    border-radius:999px;background:var(--yellow);color:var(--on-brand);white-space:nowrap}
+  .tag.no{background:transparent;border:1.5px solid var(--muted);color:var(--muted)}
+  .p-tot{font-weight:700;font-size:1.9rem;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+  .p-tot small{display:block;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin-top:5px}
+  .p-facts{margin:0;padding:13px 0 0;list-style:none;font-size:.87rem;border-top:1px solid var(--hair-2)}
+  .p-facts li{padding:4px 0;display:flex;gap:8px}
+  .p-facts li::before{content:"\00b7";font-weight:700;flex:none}
+  .macbox{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+  .macrow{display:flex;align-items:center;gap:10px;font-size:.84rem}
+  .macrow .mp{flex:none;width:84px;font-weight:650;color:var(--muted)}
+  .macrow .mt{flex:1;height:9px;border-radius:999px;background:var(--sunken);
+    position:relative;overflow:hidden}
+  .macrow .mt i{position:absolute;inset:0 auto 0 0;border-radius:999px;
+    background:var(--green);opacity:.30;transition:width .28s ease}
+  .macrow .mt b{position:absolute;inset:0 auto 0 0;border-radius:999px;
+    background:var(--green);transition:width .28s ease}
+  .macrow .mn{flex:none;width:112px;text-align:right;color:var(--muted);
+    font-variant-numeric:tabular-nums}
+  .macrow.fits .mp{color:var(--black)}
+  .macrow.out .mn{color:var(--warn)}
+  .macmark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--black);
+    opacity:.55;transition:left .28s ease}
+  .p-ih{margin:15px 0 0;font-size:10.5px;font-weight:700;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--muted)}
+  .p-incl{border-top:0;padding-top:4px;color:var(--muted);font-size:.84rem}
+  .p-why{font-size:.85rem;font-weight:500;margin:0}
+
+  .notes{border-top:1px solid var(--rule);margin-top:40px;padding:26px 0 70px;max-width:88ch;
+    font-size:.86rem;color:var(--muted)}
+  .notes b{color:var(--black);font-weight:700}
+  .notes ol{padding-left:19px;margin:12px 0 0}
+  .notes li{margin-bottom:8px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  .mbar{display:none}
+  @media (max-width:980px){
+    body{padding-bottom:70px}
+    .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;align-items:center;
+      justify-content:space-between;gap:14px;background:var(--black);color:var(--on-ink);padding:13px 22px}
+    .mbar .l{font-size:10.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#9aa39f}
+    .mbar .l b{display:block;font-size:.95rem;letter-spacing:0;text-transform:none;color:var(--on-ink);font-weight:700;margin-top:2px}
+    .mbar .v{font-weight:700;font-size:1.4rem;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  }
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+  @media print{
+    body{background:#fff;padding:0}
+    .split{grid-template-columns:1fr}
+    .acts,.cycle,.mbar,.topbar{display:none}
+    .q,.receipt,.plan{break-inside:avoid}
+  }
+</style>
+<script>
+  /* Set the theme before first paint so the page never flashes the wrong one.
+     Stored choice wins; otherwise follow the operating system. */
+  (function(){
+    var t = null;
+    try { t = localStorage.getItem("wati-theme"); } catch(e){}
+    // Light is the default everywhere; dark is opt-in and remembered per browser.
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+    // Details off is the default: the compact view an AE uses on a call.
+    var d = null;
+    try { d = localStorage.getItem("wati-detail"); } catch(e){}
+    document.documentElement.setAttribute("data-detail", d === "on" ? "on" : "off");
+  })();
+</script>
+</head>
+<body>
+<div class="topbar">
+<div class="topbar-in">
+<div class="brand">
+<img alt="Wati" onerror="this.style.display='none'" src="https://www.wati.io/wp-content/uploads/2024/11/wati-logo-svg-format.svg"/>
+<span class="divider"></span>
+<span class="toolname" data-i18n="toolname">WhatsApp cost estimator</span>
+<span class="regionpill">Mexico</span>
+</div>
+    <div class="bar-right" id="barRight">
+      <div class="ctrlbar" id="ctrlBar">
+      <div class="ctrl">
+        <span class="ctrl-l" data-i18n="ctrlCycle">Billing cycle</span>
+        <div class="cycle" id="cycleBar" role="group" aria-label="Billing cycle"></div>
+      </div>
+      <div class="ctrl">
+        <label class="ctrl-l" for="outCcy" data-i18n="ctrlCcy">Show prices in</label>
+        <div class="selwrap"><select id="outCcy"></select></div>
+      </div>
+      <div class="ctrl" id="langBox" hidden>
+        <label class="ctrl-l" for="langPick" data-i18n="ctrlLang">Language</label>
+        <div class="selwrap"><select id="langPick"></select></div>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-l" data-i18n="ctrlDetail">Details</span>
+        <button type="button" class="switch" id="detailBtn" role="switch" aria-checked="false">
+          <span class="knob">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 7.5h14M5 12h14M5 16.5h9"/></svg>
+          </span>
+          <span class="sr" data-i18n="srDetail">Show the explanatory notes</span>
+        </button>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-l" data-i18n="ctrlTheme">Dark mode</span>
+        <button type="button" class="switch" id="themeBtn" role="switch" aria-checked="false">
+          <span class="knob">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="i-sun">
+              <circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="i-moon">
+              <path d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z"/></svg>
+          </span>
+          <span class="sr">Dark mode</span>
+        </button>
+      </div>
+      </div>
+    </div>
+</div>
+</div>
+<header class="wrap masthead">
+<h1 id="headline" data-i18n="t001" data-i18n-skip="1">Work out what WhatsApp will <mark>actually</mark> cost you each month.</h1>
+<p class="lede" data-i18n="lede">Eight quick questions. The bill itemises itself as you go, then pick your currency and take it as a PDF.</p>
+</header>
+<section aria-label="Channels in the same inbox" class="wrap channels">
+<div class="chan-in">
+<div class="chan-g">
+<span class="chan-t" data-i18n="chanInc">In every plan, no extra platform fee</span>
+<ul class="chips">
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 5 16a8 8 0 1 1 3 3Z"/></svg>WhatsApp</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg>Instagram</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c5 0 9 3.7 9 8.3 0 4.6-4 8.3-9 8.3a10 10 0 0 1-2.6-.3L5 21l.9-3.4A8 8 0 0 1 3 11.3C3 6.7 7 3 12 3Z"/><path d="m7.8 13.4 2.6-2.8 2 2 2.1-2.2"/></svg>Messenger</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3.5v10.9a3.6 3.6 0 1 1-3-3.5"/><path d="M14 3.5a5 5 0 0 0 5 4.6"/></svg>TikTok</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="13" rx="2.5"/><path d="M8 20.5h8M3 8.6h18"/></svg>Web chat</li>
+</ul>
+</div>
+<div class="chan-g">
+<span class="chan-t" data-i18n="chanPaid">Also available, charged per message</span>
+<ul class="chips paid">
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h16M4 12h16M4 16.5h10"/></svg>RCS</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h15v10h-9l-4 3.5v-3.5h-2Z"/></svg>SMS · Business</li>
+</ul>
+</div>
+</div>
+<p class="chan-n" data-i18n="chanNote">This estimator prices WhatsApp. The other channels share the same inbox, automations and Astra agents — ask for RCS and SMS rates separately.</p>
+</section>
+<main class="wrap split">
+<form id="form" novalidate="">
+<section class="q">
+<div class="q-head"><span class="q-num">1</span><h2 data-i18n="t002">Where are your customers?</h2></div>
+<p class="q-note"><span data-i18n="q1note">WhatsApp charges on the country your customer's number belongs to, not where your business is. Rates move a long way between markets, so start here.</span> <span data-i18n="regionNote">Mexican billing in Mexican pesos, on the MAC bundle plans. Uses the LATAM usage rate card.</span></p>
+<label class="sr" data-i18n="srCountry" for="country">Country your customers are in</label>
+<select id="country"></select>
+<span class="hint" id="countryHint" style="margin-top:9px"></span>
+<div class="cards" id="rateCards"></div>
+</section>
+<section class="q">
+<div class="q-head"><span class="q-num">2</span><h2 data-i18n="t003">What are you using WhatsApp for?</h2></div>
+<p class="q-note" data-i18n="t004">Sets sensible starting numbers. Everything stays editable.</p>
+<div aria-label="Primary use case" class="chips" role="group">
+<button aria-pressed="false" class="chip" data-i18n="t005" data-usecase="marketing" type="button">Promotions and campaigns</button>
+<button aria-pressed="false" class="chip" data-i18n="t006" data-usecase="support" type="button">Customer support</button>
+<button aria-pressed="false" class="chip" data-i18n="t007" data-usecase="orders" type="button">Order and delivery updates</button>
+<button aria-pressed="false" class="chip" data-i18n="t008" data-usecase="otp" type="button">Logins and OTPs</button>
+<button aria-pressed="true" class="chip" data-i18n="t009" data-usecase="mixed" type="button">A mix of all of it</button>
+</div>
+</section>
+<section class="q half">
+<div class="q-head"><span class="q-num">3</span><h2 data-i18n="t010">How many WhatsApp numbers?</h2></div>
+<p class="q-note" data-i18n="t011">One number suits most businesses. Separate numbers need Business, and each extra is billed monthly.</p>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="t012">Numbers connected to Wati
+            <span class="hint" id="numbersHint"></span>
+</span>
+<input aria-label="Number of WhatsApp numbers" class="narrow num" id="numbersNum" max="20" min="1" step="1" type="number" value="1"/>
+</div>
+<input aria-label="WhatsApp numbers slider" id="numbersRange" max="10" min="1" step="1" type="range" value="1"/>
+<div class="scale"><span>1</span><span>5</span><span>10+</span></div>
+</div>
+</section>
+<section class="q half">
+<div class="q-head"><span class="q-num">4</span><h2 data-i18n="t013">How many people need a login?</h2></div>
+<p class="q-note" data-i18n="t014">Everyone answering chats needs a seat. Growth includes 3 and cannot be topped up at any price.</p>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="t015">Team members with Wati access
+            <span class="hint" id="agentsHint"></span>
+</span>
+<input aria-label="Number of users" class="narrow num" id="agentsNum" max="200" min="1" step="1" type="number" value="3"/>
+</div>
+<input aria-label="Users slider" id="agentsRange" max="40" min="1" step="1" type="range" value="3"/>
+<div class="scale"><span>1</span><span>20</span><span>40+</span></div>
+</div>
+</section>
+<section class="q" id="qMac">
+<div class="q-head"><span class="q-num">5</span><h2 data-i18n="macTitle">How many contacts will you actually talk to?</h2></div>
+<p class="q-note" data-i18n="macNote">A monthly active contact is anyone who writes in, or who an operator, automation or AI agent replies to, during the billing month. Storing contacts is free, and people who only receive a broadcast and never reply do not count. The tally resets on your billing date.</p>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="macLabel">Monthly active contacts
+            <span class="hint" id="macHint"></span>
+</span>
+<input aria-label="Monthly active contacts" class="narrow num" id="macNum" max="200000" min="0" step="50" type="number" value="1200"/>
+</div>
+<input aria-label="Monthly active contacts slider" id="macRange" max="6000" min="0" step="50" type="range" value="1200"/>
+<div class="scale"><span>0</span><span>2,500</span><span>5,000+</span></div>
+<span class="hint ex" data-i18n="macEx">Rough count: the unique contacts your team handles on an average day, times your working days. 50 a day over 22 days is about 1,100.</span>
+</div>
+<div class="macbox" id="macBox"></div>
+</section>
+<section class="q">
+<div class="q-head"><span class="q-num">6</span><h2 data-i18n="t016">How many messages a month?</h2></div>
+<p class="q-note" data-i18n="t017">WhatsApp bills per delivered message by category, not per contact. Split your monthly volume across the three that cost money.</p>
+<div class="vgrid">
+<div class="field">
+<div class="field-top">
+<span class="field-label" data-i18n="t018"><i class="dot d-mkt"></i>Marketing<span class="sr" data-i18n="srMsgs"> messages per month</span></span>
+<input aria-label="Marketing messages per month" class="num" id="mktNum" max="5000000" min="0" step="100" type="number" value="15000"/>
+</div>
+<input aria-label="Marketing messages slider" class="r-mkt" id="mktRange" max="100000" min="0" step="250" type="range" value="15000"/>
+<div class="scale"><span>0</span><span>50,000</span><span>100,000+</span></div>
+<span class="hint" data-i18n="t019">Offers, launches, re-engagement, abandoned cart. The most expensive category by far.</span>
+</div>
+<div class="field">
+<div class="field-top">
+<span class="field-label" data-i18n="t020"><i class="dot d-util"></i>Utility</span>
+<input aria-label="Utility messages per month" class="num" id="utilNum" max="5000000" min="0" step="100" type="number" value="10000"/>
+</div>
+<input aria-label="Utility messages slider" id="utilRange" max="100000" min="0" step="250" type="range" value="10000"/>
+<div class="scale"><span>0</span><span>50,000</span><span>100,000+</span></div>
+<span class="hint" data-i18n="t021">Order, delivery, payment and appointment updates — anything tied to a transaction already made.</span>
+</div>
+<div class="field">
+<div class="field-top">
+<span class="field-label" data-i18n="t022"><i class="dot d-auth"></i>Authentication</span>
+<input aria-label="Authentication messages per month" class="num" id="authNum" max="5000000" min="0" step="100" type="number" value="0"/>
+</div>
+<input aria-label="Authentication messages slider" class="r-auth" id="authRange" max="50000" min="0" step="100" type="range" value="0"/>
+<div class="scale"><span>0</span><span>25,000</span><span>50,000+</span></div>
+<span class="hint" data-i18n="t023">One-time passwords and login codes only.</span>
+</div>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="t024">Service messages a month
+            <span class="hint ex" data-i18n="t025">Free-form replies you send inside the 24-hour window. Billable per message from 1 Oct 2026, after the first 1,000 a month. Inbound is always free. <a data-i18n="t026" href="https://support.wati.io/en/articles/16954666-whatsapp-business-platform-api-pricing-changes-service-messages-and-click-to-message-ads" rel="noopener" target="_blank">What changed</a></span>
+</span>
+<input aria-label="Service messages per month" class="num" id="svcNum" max="2000000" min="0" step="100" type="number" value="0"/>
+</div>
+<input aria-label="Service messages slider" id="svcRange" max="50000" min="0" step="100" type="range" value="0"/>
+<div class="scale"><span>0</span><span>25,000</span><span>50,000+</span></div>
+</div>
+</div>
+<div class="mix">
+<div class="mix-t"><span data-i18n="mixT">Your message mix</span><b id="mixTotal">—</b></div>
+<div class="mixbar" id="mixbar" role="img" aria-label="Share of monthly messages by category"><i></i><i></i><i></i><i></i></div>
+<div class="mixlegend" id="mixlegend"></div>
+</div>
+
+<div class="freebox">
+<h3 data-i18n="t027">What you're still not charged for</h3>
+<ul>
+<li data-i18n="t028"><b>Inbound messages.</b> Anything the customer sends you is free.</li>
+<li data-i18n="t029"><b data-i18n="b029">Your first 1,000 service messages a month</b>, per WhatsApp Business Account, resetting monthly.</li>
+<li data-i18n="t030"><b data-i18n="b030">Click-to-WhatsApp ad conversations.</b> Free today. Meta is extending the window to 7 days; date to be confirmed.</li>
+</ul>
+<p data-i18n="t031" style="margin:11px 0 0;font-size:.86rem"><b data-i18n="b031">Changed on 1 October 2026:</b> service messages became billable per message, and utility templates inside the 24-hour window are billable again.</p>
+</div>
+</section>
+<section class="q">
+<div class="q-head"><span class="q-num">6</span><h2 data-i18n="t032">How much runs on autopilot?</h2></div>
+<p class="q-note" data-i18n="t033">Counted each time one of your automations fires for a customer — chatbot, keyword, routing rule, sequence or Flow. Run out and automations stop until you top up. Extras are priced in bands. <a data-i18n="t034" href="https://support.wati.io/en/articles/11462996-understanding-automation-triggers-and-their-cost" rel="noopener" target="_blank">How triggers are counted and charged</a></p>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="t035">Automation triggers a month
+            <span class="hint ex" data-i18n="t036">Roughly one per customer who starts an automated chat, plus one per automated follow-up. API-initiated actions don't count.</span>
+</span>
+<input aria-label="Automation triggers per month" class="num" id="trigNum" max="1000000" min="0" step="100" type="number" value="2000"/>
+</div>
+<input aria-label="Automation triggers slider" id="trigRange" max="30000" min="0" step="100" type="range" value="2000"/>
+<div class="scale"><span>0</span><span>15,000</span><span>30,000+</span></div>
+</div>
+<p class="q-note" data-i18n="whNote">Growth handles keyword-level rules only. Multi-step chatbots and webhook steps start at Pro.</p>
+</section>
+<section class="q">
+<div class="q-head"><span class="q-num">7</span><h2 data-i18n="q7h">AI, Astra and credits</h2></div>
+<p class="q-note" data-i18n="q7n">Astra comes with every plan. Credits are one shared pool; anything over the allowance is priced in bands.</p>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="t039">Wati AI credits a month
+            <span class="hint ex" data-i18n="t040">One pool shared by Wati AI and Astra. Free each month: 2,000 Growth, 5,000 Pro, 20,000 Business. Leave at 0 if the team won't use AI.</span>
+</span>
+<input aria-label="Wati AI credits per month" class="num" id="aiNum" max="500000" min="0" step="500" type="number" value="0"/>
+</div>
+<input aria-label="Wati AI credits slider" id="aiRange" max="40000" min="0" step="500" type="range" value="0"/>
+<div class="scale"><span>0</span><span>20,000</span><span>40,000+</span></div>
+</div>
+<div class="field">
+<div class="field-top">
+<span class="field-label stack" data-i18n="agentsAi">Astra AI agents you need
+            <span class="hint ex" data-i18n="agentsAiHint">Growth 1, Pro 2, Business unlimited. Ask for more than the plan allows and it's ruled out.</span>
+</span>
+<input aria-label="Astra AI agents" class="num" id="aiAgentNum" max="50" min="0" step="1" type="number" value="1"/>
+</div>
+</div>
+<div class="check">
+<input id="needVoice" type="checkbox"/>
+<div><label data-i18n="voice" for="needVoice">I need a voice AI agent</label>
+<span class="hint" data-i18n="voiceHint">Voice AI is Business only — ticking this rules out Growth and Pro.</span></div>
+</div>
+<div class="aibox">
+<h3 data-i18n="t041">Astra is included, and credits are now one pool</h3>
+<ul>
+<li data-i18n="t042"><b data-i18n="b042">Astra AI agents come with the plan</b> — 1 on Growth, 2 on Pro, unlimited on Business. Voice AI is Business only. No separate Astra subscription.</li>
+<li data-i18n="t043"><b data-i18n="b043">One credit pool.</b> One balance covers Wati AI and Astra. The old AI Co-pilot credits are retired.</li>
+<li data-i18n="t044"><b data-i18n="b044">Credits don't roll over.</b> They expire on your billing date and reset to the plan's allowance. Top-ups don't carry over either.</li>
+<li data-i18n="t045"><b data-i18n="b045">Top-ups start at 2,000.</b> 1,000-credit packs are gone and the per-credit price halved — the same money buys twice as much.</li>
+</ul>
+<p><a data-i18n="t046" href="https://support.wati.io/en/articles/17565154-understanding-wati-and-astra-bundle-plans-and-ai-credits" rel="noopener" target="_blank">How bundle plans and AI credits work, including rollover</a></p>
+</div>
+</section>
+<section class="q">
+<div class="q-head"><span class="q-num">8</span><h2 data-i18n="q8h">Add-ons</h2></div>
+<p class="q-note" data-i18n="q8n10">Prices straight from this region's rate card. Per-user add-ons sell in packs of ten, so 12 operators bill as 20.</p>
+<div id="addonList"></div>
+<div class="check">
+<input id="needShopify" type="checkbox"/>
+<div><label data-i18n="shopify" for="needShopify">Connect Shopify</label>
+<span class="hint" data-i18n="shopifyHint">Needed for abandoned-cart, COD confirmation and automated order updates. $4.99 a month, billed in USD.</span></div>
+</div>
+</section>
+</form>
+<aside aria-label="Cost estimate" class="rcol">
+<div class="ctrlslot" id="ctrlSlot"></div>
+<div class="receipt">
+<div class="r-head">
+<div class="r-top">
+<span class="label" data-i18n="t047">Estimated monthly cost</span>
+</div>
+<h2 data-i18n="t048" id="planName">Wati Pro</h2>
+<p class="verdict" id="verdict"></p>
+<div aria-label="Which plan to quote" class="planpick" id="planPick" role="group">
+<button aria-pressed="true" data-i18n="t049" data-plan="auto" type="button">Best fit<small data-i18n-skip="1"></small></button>
+<button aria-pressed="false" data-i18n="t050" data-plan="growth" type="button">Growth<small data-i18n-skip="1"></small></button>
+<button aria-pressed="false" data-i18n="t051" data-plan="pro" type="button">Pro<small data-i18n-skip="1"></small></button>
+<button aria-pressed="false" data-i18n="t052" data-plan="business" type="button">Business<small data-i18n-skip="1"></small></button>
+</div>
+</div>
+<div class="pinned" hidden="" id="pinned"></div>
+<div class="warnbar" hidden="" id="warnbar"></div>
+<div class="lines" id="lines"></div>
+<div class="totals">
+<div class="fxline" id="fxline"></div>
+<div class="disc">
+<label for="discNum" data-i18n="discLabel">Discount you can offer</label>
+<div class="disc-in">
+<input class="num" type="number" id="discNum" min="0" max="100" step="1" value="0" aria-label="Discount percent">
+<span class="disc-pct">%</span>
+<span class="disc-note" data-i18n="discApplies">on the whole package — override any line below</span>
+</div>
+<div class="disc-rows" id="discRows"></div>
+<div class="disc-out" id="discOut" hidden></div>
+</div>
+<div class="grand">
+<span class="l" data-i18n="t053">Total per month<small id="cycleLabel">plan billed annually</small></span>
+<span class="v num" id="grand">—</span>
+</div>
+<div class="grand-alt" id="grandAlt" hidden></div>
+<div aria-label="What the cost is made of" class="comp" id="comp" role="img"><i></i><i></i><i></i><i></i></div>
+<div class="clegend" id="clegend"></div>
+</div>
+<div class="unit">
+<span data-i18n="t054">Blended <b id="blended">—</b> per message</span>
+<span data-i18n="t055">Yearly <b id="yearly">—</b></span>
+</div>
+<div class="acts">
+<button class="btn pri" data-i18n="t056" id="pdfBtn" type="button">Save as PDF</button>
+<button class="btn" data-i18n="t057" id="copyBtn" type="button">Copy for email</button>
+</div>
+</div>
+</aside>
+</main>
+<section class="wrap section">
+<div class="s-head">
+<h2 data-i18n="t058">The same requirements, priced on all three plans</h2>
+<p data-i18n="t059">A cheaper plan isn't always a cheaper bill once users, top-ups and per-plan message rates are counted.</p>
+</div>
+<div class="plans" id="plans"></div>
+</section>
+<div class="wrap notes">
+<b data-i18n="notesH">What’s assumed here, so you can check it.</b>
+<ol>
+<li data-i18n="t060">Plan, seat and add-on prices are the published figures. Message rates come from this region's Wati rate card, effective 1 October 2026, billed on the recipient's country. Higher tiers are cheaper per message.</li>
+<li><span data-i18n="rnUsd">Message rates are quoted in USD on the rate card. Where the plan is billed in another currency, the two are converted into the currency picked at the top of the quote panel, at today's rate.</span> <span data-i18n="svcLower">Service messages have their own per-country rate, lower than the utility rate.</span></li>
+<li data-i18n="t061">The rate cards are linked under question 1 — open the source on a call rather than quoting from memory.</li>
+<li data-i18n="t062">The estimate picks the cheapest plan that fits. Pin a plan to quote higher; anything it can't cover is left out of the total and flagged.</li>
+<li data-i18n="t063">Growth's 15,000 broadcast cap is checked against marketing plus utility. Authentication is API-triggered one-to-one and doesn't count.</li>
+<li data-i18n="t064">Included triggers: 1,000 / 2,000 / 5,000. Extras are priced in bands — you pay the first band that covers you.</li>
+<li data-i18n="t065">Included Wati AI credits: 2,000 / 5,000 / 20,000, one pool across Wati AI and Astra. Extras are banded and don't roll over.</li>
+<li data-i18n="t066">Astra agents come with the plan: 1 / 2 / unlimited, Voice AI on Business only. Not a separate subscription.</li>
+<li data-i18n="t067">Extra WhatsApp numbers need Business. Shopify is $4.99 a month in USD, so it moves with the exchange rate.</li>
+<li data-i18n="t068">Message charges are drawn from a prepaid wallet, separate from the subscription invoice.</li>
+<li><span data-i18n="t069">Volume discounts above roughly a million messages a month aren't modelled. Also excluded: custom onboarding and setup, technical account management and professional services.</span> <a class="ao-link" data-i18n="onbLink" href="https://support.wati.io/en/articles/11462987-service-add-on-dedicated-onboarding" rel="noopener" target="_blank">Dedicated onboarding</a></li>
+<li data-i18n="t071">Exchange rates come from Frankfurter, falling back to Exchange Rate API. Both publish once a day, so the rate is a daily reference rate, not a dealing rate. Wati invoices in <b data-i18n-skip="1">MXN</b>; your bank’s rate on the day will differ slightly.</li>
+</ol>
+</div>
+<div aria-hidden="true" class="mbar">
+<span class="l" data-i18n="t070">Estimated monthly<b id="mbPlan">Wati Pro</b></span>
+<span class="v num" id="mbTotal">—</span>
+</div>
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     Region configuration, generated at build time.
+     ============================================================ */
+  var CONFIG = {"region": "Mexico", "card": "L", "planCcy": "MXN", "planSymbol": "Mex$", "cycles": [{"key": "annual", "label": "Annual", "sub": "plan billed annually"}, {"key": "quarterly", "label": "Quarterly", "sub": "plan billed quarterly"}, {"key": "monthly", "label": "Monthly", "sub": "plan billed monthly"}], "rateCcy": "USD", "rateSymbol": "$", "payg": null, "plans": {"growth": {"label": "Growth", "prices": {"annual": 829, "quarterly": 1049, "monthly": 1049}, "seats": 3, "extraSeat": null, "triggers": 1000, "aiCredits": 2000, "broadcastCap": 15000, "numbers": 1, "advanced": false}, "pro": {"label": "Pro", "prices": {"annual": 1689, "quarterly": 2099, "monthly": 2099}, "seats": 5, "extraSeat": 449, "triggers": 2000, "aiCredits": 5000, "broadcastCap": null, "numbers": 1, "advanced": true}, "business": {"label": "Business", "prices": {"annual": 4249, "quarterly": 5299, "monthly": 5299}, "seats": 10, "extraSeat": 1279, "triggers": 5000, "aiCredits": 20000, "broadcastCap": null, "numbers": null, "advanced": true}}, "extraNumber": 550, "shopifyUsd": 4.99, "currencies": [{"country": "Mexico", "ccy": "MXN"}], "fallbackRates": {"AED": 3.6725, "AFN": 65.108, "ALL": 80.47, "AMD": 365.99, "ANG": 1.79, "AOA": 917.45, "ARS": 1491.32, "AUD": 1.4168, "AWG": 1.7901, "AZN": 1.6995, "BAM": 1.6942, "BBD": 2.0327, "BDT": 123.31, "BGN": 1.6942, "BHD": 0.376, "BIF": 2995.47, "BMD": 1.0, "BND": 1.2798, "BOB": 11.7309, "BRL": 5.159, "BSD": 1.0105, "BTN": 95.35, "BWP": 13.2298, "BYN": 2.9674, "BZD": 2.0317, "CAD": 1.3927, "CDF": 2278.48, "CHF": 0.8118, "CLP": 913.97, "CNY": 6.741, "COP": 3129.33, "CRC": 451.38, "CUP": 24.0, "CVE": 95.51, "CZK": 21.01, "DJF": 177.24, "DKK": 6.4776, "DOP": 59.2, "DZD": 132.93, "EGP": 50.197, "ERN": 15.2284, "ETB": 160.46, "EUR": 0.86621, "FJD": 2.2187, "FKP": 0.74026, "GBP": 0.74026, "GEL": 2.6135, "GGP": 0.74026, "GHS": 11.6183, "GIP": 0.74768, "GMD": 73.336, "GNF": 8270, "GTQ": 7.628, "GYD": 210.97, "HKD": 7.8533, "HNL": 26.814, "HTG": 130.71, "HUF": 315.7, "IDR": 17850, "ILS": 2.9926, "IMP": 0.74026, "INR": 95.35, "IQD": 1309.61, "IRR": 1370869, "ISK": 122.98, "JEP": 0.74026, "JMD": 157.0, "JOD": 0.709, "JPY": 159.27, "KES": 129.1, "KGS": 87.47, "KHR": 4051.61, "KMF": 426.67, "KRW": 1416.19, "KWD": 0.30781, "KYD": 0.8372, "KZT": 465.56, "LAK": 22518, "LBP": 89899, "LKR": 333.63, "LRD": 181.74, "LSL": 16.15, "LYD": 6.3708, "MAD": 9.3001, "MDL": 17.3256, "MGA": 4281.72, "MKD": 53.307, "MMK": 2097.84, "MNT": 3596.39, "MOP": 8.0889, "MRU": 40.128, "MUR": 47.13, "MVR": 15.3995, "MWK": 1737.0, "MXN": 17.0699, "MYR": 4.0867, "MZN": 63.635, "NAD": 16.1578, "NGN": 1362.05, "NIO": 36.779, "NOK": 9.4901, "NPR": 152.58, "NZD": 1.7046, "OMR": 0.3845, "PEN": 3.3669, "PGK": 4.4256, "PHP": 61.188, "PKR": 278.35, "PLN": 3.7291, "PYG": 5967, "QAR": 3.64, "RON": 4.5408, "RSD": 101.69, "RUB": 82.76, "RWF": 1471.74, "SAR": 3.75, "SBD": 8.0122, "SCR": 14.2034, "SDG": 600.15, "SEK": 9.5305, "SGD": 1.2798, "SHP": 0.74026, "SLE": 24.483, "SOS": 571.47, "SRD": 37.943, "SSP": 5372, "STN": 21.335, "SYP": 122.03, "SZL": 16.1582, "THB": 33.078, "TJS": 9.2376, "TMT": 3.5, "TND": 2.9316, "TOP": 2.3642, "TRY": 47.751, "TTD": 6.747, "TWD": 32.209, "TZS": 2642.62, "UAH": 44.724, "UGX": 3717.53, "USD": 1, "UYU": 40.262, "UZS": 11923, "VES": 762.7, "VND": 26034, "VUV": 117.19, "WST": 2.7118, "XAF": 568.2, "XCD": 2.7392, "XCG": 1.7962, "XOF": 568.2, "XPF": 103.4, "YER": 237.22, "ZAR": 16.1342, "ZMW": 18.7468, "ZWG": 26.57}, "fallbackAsOf": "13 August 2026", "serviceFree": 1000, "rateCards": {"folder": "https://drive.google.com/drive/folders/11XO011jss3CKYw5kFShtN7QPdUhRYtPB", "effective": "1 October 2026", "items": [{"label": "Growth & Pro", "card": "Wati-Pricing-Rate-Card-Growth-Plan-Pro-Plan-USD-L.pdf", "url": "https://drive.google.com/file/d/1N0Ej_8cK0U1CnsbT9w6gKIzj6pOm4L0W/view"}, {"label": "Business", "card": "Wati-Pricing-Rate-Card-Business-Plan-USD-L.pdf", "url": "https://drive.google.com/file/d/1zB0xa4le3za8lUULUZhVf7cZufxYN1Rf/view"}]}, "addonPack": 10, "mac": {"pack": 250, "price": 370, "base": {"growth": 500, "pro": 1000, "business": 2500}, "ceil": {"growth": 500, "pro": 2500, "business": 5000}, "fup": {"growth": 5, "pro": 10, "business": 10}}, "addons": [{"k": "opscope", "label": "Operator scope and privacy", "unit": "user", "p": 185.0, "hint": "Each operator sees only their own assigned chats, and the customer's contact details stay hidden from them. One add-on, both behaviours.", "url": "https://support.wati.io/en/articles/11865694-how-to-manage-chat-visibility-to-restrict-access-to-assigned-conversations", "minPlan": "pro", "free": ["business"]}, {"k": "masking", "label": "Phone number masking", "unit": "user", "p": 185.0, "hint": "Masks the customer's number in the inbox. Usually bought for compliance.", "url": "https://support.wati.io/en/articles/11463006-how-to-hide-or-mask-customer-phone-numbers-in-wati", "minPlan": "pro", "free": ["business"]}, {"k": "roundrobin", "label": "Round-robin chat assignment", "unit": "user", "p": 185.0, "hint": "Shares incoming chats evenly across available agents.", "url": "https://support.wati.io/en/articles/14270796-how-to-use-round-robin-assignment-for-chats-in-wati", "minPlan": "pro", "free": ["business"]}, {"k": "apilimit", "label": "API monthly limit increase", "unit": "month", "p": 3700.0, "hint": "Business includes 20M API calls a month; this doubles the ceiling to 40M.", "url": "https://support.wati.io/en/articles/11823158-understanding-wati-apis-and-their-usage-limits", "minPlan": "business"}, {"k": "apihigh", "label": "API high volume", "unit": "month", "p": 3700.0, "hint": "Pro allows 60 API calls every 10 seconds and Business 100; this raises it to 200.", "url": "https://support.wati.io/en/articles/11823158-understanding-wati-apis-and-their-usage-limits", "minPlan": "pro"}, {"k": "forms", "label": "Forms", "unit": "month", "p": 1850.0, "hint": "Pro includes 2 forms and Business 10; this raises the ceiling to 25.", "url": "https://support.wati.io/en/articles/11463180-how-to-create-and-use-whatsapp-flows-in-wati", "minPlan": "business"}, {"k": "byoa", "label": "BYOA — bring your own AI agent", "unit": "agent", "p": 1850, "minPlan": "pro", "url": "https://support.wati.io/en/articles/12320095-how-to-use-bring-your-own-ai-byoa-to-connect-and-manage-your-own-ai-agents-in-wati", "hint": "Connect a third-party AI agent, billed per agent. Astra agents come with the plan and aren't charged here."}, {"k": "blitz", "label": "Blitz — 200 messages/second", "unit": "month", "p": 3700.0, "hint": "Broadcast send speed up to 200 messages a second, for time-critical sends.", "url": "https://support.wati.io/en/articles/11463452-is-there-a-limit-to-broadcast-messages", "minPlan": "business"}], "sessionTiers": [[1000, 370.0], [2000, 740.0], [3000, 1110.0], [4000, 1480.0], [6000, 2050.0], [8000, 2800.0], [10000, 3330.0], [15000, 4650.0], [20000, 5750.0], [30000, 7770.0], [40000, 9700.0], [50000, 11650.0], [75000, 15750.0], [100000, 19500.0], [150000, 26000.0], [200000, 32500.0], [250000, 38850.0], [300000, 45300.0], [400000, 55500.0], [500000, 65650.0], [750000, 86200.0], [1000000, 107000.0]], "aiTiers": [[2000, 370.0], [4000, 740.0], [6000, 1110.0], [8000, 1480.0], [10000, 1850.0], [12000, 2220.0], [14000, 2590.0], [16000, 2960.0], [18000, 3330.0], [20000, 3700.0], [22000, 4070.0], [24000, 4440.0], [26000, 4810.0], [28000, 5180.0], [30000, 5550.0], [32000, 5920.0], [34000, 6290.0], [36000, 6660.0], [38000, 7030.0], [40000, 7400.0], [42000, 7770.0], [44000, 8140.0], [46000, 8510.0], [48000, 8880.0], [50000, 9250.0], [52000, 9620.0], [54000, 9990.0], [56000, 10360.0], [58000, 10730.0], [60000, 11100.0], [62000, 11470.0], [64000, 11840.0], [66000, 12210.0], [68000, 12580.0], [70000, 12950.0], [72000, 13320.0], [74000, 13690.0], [76000, 14060.0], [78000, 14430.0], [80000, 14800.0], [82000, 15170.0], [84000, 15540.0], [86000, 15910.0], [88000, 16280.0], [90000, 16650.0], [92000, 17020.0], [94000, 17390.0], [96000, 17760.0], [98000, 18130.0], [100000, 18500.0]], "aiTop": 18870.0, "homeIsos": ["MX"], "defaultCountry": "MX", "defaultOutCcy": "MXN"};
+
+  /* Per-country per-message rates from the region's usage rate card
+     (1 October 2026), in CONFIG.rateCcy.  Nine numbers per country:
+     ISO: [growth mkt,util,auth, pro mkt,util,auth, business mkt,util,auth]
+     Regions whose Growth and Pro share one card simply repeat those three. */
+  var RATES = {AF:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],AL:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],DZ:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],AS:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],AD:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],AO:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],AI:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],AQ:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],AG:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],AR:[0.0773,0.0351,0.0351,0.0773,0.0351,0.0351,0.0729,0.0325,0.0325,0.0286,0.0286,0.0276],AM:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],AW:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],AU:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],AT:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],AZ:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],BS:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BH:[0.049,0.0123,0.0123,0.049,0.0123,0.0123,0.0463,0.0114,0.0114,0.01,0.01,0.0096],BD:[0.0915,0.005,0.005,0.0915,0.005,0.005,0.0864,0.0046,0.0046,0.0041,0.0041,0.0039],BB:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BY:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],BE:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],BZ:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BJ:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],BM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BT:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BO:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],BA:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BW:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],BR:[0.0781,0.0092,0.0092,0.0781,0.0092,0.0092,0.0738,0.0085,0.0085,0.0075,0.0075,0.0072],IO:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],VG:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BN:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],BG:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],BF:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],BI:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],KH:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],CM:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],CA:[0.0313,0.0046,0.0046,0.0313,0.0046,0.0046,0.0295,0.0043,0.0043,0.0037,0.0037,0.0036],CV:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],KY:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CF:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],TD:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],CL:[0.1111,0.027,0.027,0.1111,0.027,0.027,0.1049,0.025,0.025,0.022,0.022,0.0212],CN:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],CX:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CO:[0.0156,0.0011,0.0011,0.0156,0.0011,0.0011,0.0148,0.001,0.001,0.0009,0.0009,0.0008],KM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CK:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CR:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],HR:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],CU:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CW:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CY:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],CZ:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],CD:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],DK:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],DJ:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],DM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],DO:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],TL:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],EC:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],EG:[0.0805,0.0049,0.0049,0.0805,0.0049,0.0049,0.076,0.0045,0.0045,0.004,0.004,0.0038],SV:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],GQ:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],ER:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],EE:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],ET:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],FK:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],FO:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],FJ:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],FI:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],FR:[0.1074,0.0405,0.0405,0.1074,0.0405,0.0405,0.1014,0.0375,0.0375,0.033,0.033,0.0318],PF:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GA:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],GM:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],GE:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],DE:[0.1706,0.0743,0.0743,0.1706,0.0743,0.0743,0.1611,0.0688,0.0688,0.0605,0.0605,0.0583],GH:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],GI:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GR:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],GL:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GD:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GU:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GT:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],GG:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GN:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],GW:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],GY:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],HT:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],HN:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],HK:[0.0915,0.0351,0.0351,0.0915,0.0351,0.0351,0.0864,0.0325,0.0325,0.0286,0.0286,0.0276],HU:[0.1075,0.0473,0.0473,0.1075,0.0473,0.0473,0.1015,0.0438,0.0438,0.0385,0.0385,0.0371],IS:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],IN:[0.0148,0.0019,0.0019,0.0148,0.0019,0.0019,0.0139,0.0018,0.0018,0.0015,0.0015,0.0015],ID:[0.0514,0.0338,0.0338,0.0514,0.0338,0.0338,0.0485,0.0313,0.0313,0.0275,0.0275,0.0265],IR:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],IQ:[0.0426,0.0107,0.0107,0.0426,0.0107,0.0107,0.0402,0.0099,0.0099,0.0087,0.0087,0.0084],IE:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],IM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],IL:[0.0441,0.0072,0.0072,0.0441,0.0072,0.0072,0.0417,0.0066,0.0066,0.0058,0.0058,0.0056],IT:[0.0994,0.0405,0.0405,0.0994,0.0405,0.0405,0.0938,0.0375,0.0375,0.033,0.033,0.0318],CI:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],JM:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],JP:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],JE:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],JO:[0.049,0.0123,0.0123,0.049,0.0123,0.0123,0.0463,0.0114,0.0114,0.01,0.01,0.0096],KZ:[0.0755,0.0243,0.0243,0.0755,0.0243,0.0243,0.0713,0.0225,0.0225,0.0198,0.0198,0.0191],KE:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],KI:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],XK:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],KW:[0.099,0.0594,0.0594,0.099,0.0594,0.0594,0.0935,0.055,0.055,0.0484,0.0484,0.0466],KG:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],LA:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],LV:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],LB:[0.049,0.0123,0.0123,0.049,0.0123,0.0123,0.0463,0.0114,0.0114,0.01,0.01,0.0096],LS:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],LR:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],LY:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],LI:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],LT:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],LU:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MO:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MK:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MG:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],MW:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],MY:[0.1075,0.0189,0.0189,0.1075,0.0189,0.0189,0.1015,0.0175,0.0175,0.0154,0.0154,0.0148],MV:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],ML:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],MT:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MH:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MR:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],MU:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],YT:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MX:[0.0496,0.0115,0.0115,0.0496,0.0115,0.0115,0.0468,0.0106,0.0106,0.0094,0.0094,0.009],FM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MD:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],MC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MN:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],ME:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MS:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MA:[0.0518,0.0311,0.0311,0.0518,0.0311,0.0311,0.0489,0.0288,0.0288,0.0253,0.0253,0.0244],MZ:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],MM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],NA:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],NR:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],NP:[0.0915,0.0046,0.0046,0.0915,0.0046,0.0046,0.0864,0.0043,0.0043,0.0037,0.0037,0.0036],NL:[0.1996,0.0675,0.0675,0.1996,0.0675,0.0675,0.1884,0.0625,0.0625,0.055,0.055,0.053],AN:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],NC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],NZ:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],NI:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],NE:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],NG:[0.0645,0.009,0.009,0.0645,0.009,0.009,0.0609,0.0084,0.0084,0.0074,0.0074,0.0071],NU:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],KP:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MP:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],NO:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],OM:[0.0426,0.0333,0.0333,0.0426,0.0333,0.0333,0.0402,0.0309,0.0309,0.0272,0.0272,0.0262],XX:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],PK:[0.0591,0.0203,0.0203,0.0591,0.0203,0.0203,0.0558,0.0188,0.0188,0.0165,0.0165,0.0159],PW:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],PS:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],PA:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],PG:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],PY:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],PE:[0.0879,0.0405,0.0405,0.0879,0.0405,0.0405,0.083,0.0375,0.0375,0.033,0.033,0.0318],PH:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],PN:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],PL:[0.0458,0.0165,0.0165,0.0458,0.0165,0.0165,0.0432,0.0153,0.0153,0.0134,0.0134,0.0129],PT:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],PR:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],QA:[0.0426,0.0162,0.0162,0.0426,0.0162,0.0162,0.0402,0.015,0.015,0.0132,0.0132,0.0127],CG:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],RE:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],RO:[0.1075,0.0392,0.0392,0.1075,0.0392,0.0392,0.1015,0.0363,0.0363,0.0319,0.0319,0.0307],RU:[0.1003,0.054,0.054,0.1003,0.054,0.054,0.0946,0.05,0.05,0.044,0.044,0.0424],RW:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],BL:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SH:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],KN:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],LC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],MF:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],PM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],VC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],WS:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SM:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],ST:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SA:[0.072,0.0144,0.0144,0.072,0.0144,0.0144,0.068,0.0134,0.0134,0.0118,0.0118,0.0113],SN:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],RS:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],SC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SL:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],SG:[0.0915,0.0216,0.0216,0.0915,0.0216,0.0216,0.0864,0.02,0.02,0.0176,0.0176,0.017],SX:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SK:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],SI:[0.1075,0.0286,0.0286,0.1075,0.0286,0.0286,0.1015,0.0265,0.0265,0.0233,0.0233,0.0225],SB:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SO:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],ZA:[0.0474,0.0128,0.0128,0.0474,0.0128,0.0128,0.0447,0.0119,0.0119,0.0105,0.0105,0.0101],KR:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SS:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],ES:[0.0884,0.027,0.027,0.0884,0.027,0.027,0.0834,0.025,0.025,0.022,0.022,0.0212],LK:[0.0915,0.0027,0.0027,0.0915,0.0027,0.0027,0.0864,0.0025,0.0025,0.0022,0.0022,0.0021],SD:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],SR:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SJ:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],SZ:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],SE:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],CH:[0.074,0.0231,0.0231,0.074,0.0231,0.0231,0.0699,0.0214,0.0214,0.0188,0.0188,0.0181],SY:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],TW:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],TJ:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],TZ:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],TH:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],TG:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],TK:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],TO:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],TT:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],TN:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],TR:[0.0136,0.0012,0.0012,0.0136,0.0012,0.0012,0.0129,0.0011,0.0011,0.001,0.001,0.001],TM:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],TC:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],TV:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],VI:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],UG:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],UA:[0.1075,0.0402,0.0402,0.1075,0.0402,0.0402,0.1015,0.0373,0.0373,0.0328,0.0328,0.0316],AE:[0.072,0.0212,0.0212,0.072,0.0212,0.0212,0.068,0.0196,0.0196,0.0173,0.0173,0.0166],GB:[0.0794,0.0297,0.0297,0.0794,0.0297,0.0297,0.0749,0.0275,0.0275,0.0242,0.0242,0.0233],US:[0.0313,0.0046,0.0046,0.0313,0.0046,0.0046,0.0295,0.0043,0.0043,0.0037,0.0037,0.0036],UY:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],UZ:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],VU:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],VA:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],VE:[0.0925,0.0153,0.0153,0.0925,0.0153,0.0153,0.0873,0.0141,0.0141,0.0124,0.0124,0.012],VN:[0.1053,0.0153,0.0153,0.1053,0.0153,0.0153,0.0994,0.0141,0.0141,0.0124,0.0124,0.012],WF:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],EH:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082],YE:[0.049,0.0123,0.0123,0.049,0.0123,0.0123,0.0463,0.0114,0.0114,0.01,0.01,0.0096],ZM:[0.0281,0.0054,0.0054,0.0281,0.0054,0.0054,0.0266,0.005,0.005,0.0044,0.0044,0.0042],ZW:[0.0755,0.0104,0.0104,0.0755,0.0104,0.0104,0.0713,0.0096,0.0096,0.0085,0.0085,0.0082]};
+  var NAMES = {AF:"Afghanistan",AL:"Albania",DZ:"Algeria",AS:"American Samoa",AD:"Andorra",AO:"Angola",AI:"Anguilla",AQ:"Antarctica",AG:"Antigua and Barbuda",AR:"Argentina",AM:"Armenia",AW:"Aruba",AU:"Australia",AT:"Austria",AZ:"Azerbaijan",BS:"Bahamas",BH:"Bahrain",BD:"Bangladesh",BB:"Barbados",BY:"Belarus",BE:"Belgium",BZ:"Belize",BJ:"Benin",BM:"Bermuda",BT:"Bhutan",BO:"Bolivia",BA:"Bosnia and Herzegovina",BW:"Botswana",BR:"Brazil",IO:"British Indian Ocean Territory",VG:"British Virgin Islands",BN:"Brunei",BG:"Bulgaria",BF:"Burkina Faso",BI:"Burundi",KH:"Cambodia",CM:"Cameroon",CA:"Canada",CV:"Cape Verde",KY:"Cayman Islands",CF:"Central African Republic",TD:"Chad",CL:"Chile",CN:"China",CX:"Christmas Island",CC:"Cocos Islands",CO:"Colombia",KM:"Comoros",CK:"Cook Islands",CR:"Costa Rica",HR:"Croatia",CU:"Cuba",CW:"Curacao",CY:"Cyprus",CZ:"Czech Republic",CD:"Democratic Republic of the Congo",DK:"Denmark",DJ:"Djibouti",DM:"Dominica",DO:"Dominican Republic",TL:"East Timor",EC:"Ecuador",EG:"Egypt",SV:"El Salvador",GQ:"Equatorial Guinea",ER:"Eritrea",EE:"Estonia",ET:"Ethiopia",FK:"Falkland Islands",FO:"Faroe Islands",FJ:"Fiji",FI:"Finland",FR:"France",PF:"French Polynesia",GA:"Gabon",GM:"Gambia",GE:"Georgia",DE:"Germany",GH:"Ghana",GI:"Gibraltar",GR:"Greece",GL:"Greenland",GD:"Grenada",GU:"Guam",GT:"Guatemala",GG:"Guernsey",GN:"Guinea",GW:"Guinea-Bissau",GY:"Guyana",HT:"Haiti",HN:"Honduras",HK:"Hong Kong",HU:"Hungary",IS:"Iceland",IN:"India",ID:"Indonesia",IR:"Iran",IQ:"Iraq",IE:"Ireland",IM:"Isle of Man",IL:"Israel",IT:"Italy",CI:"Ivory Coast",JM:"Jamaica",JP:"Japan",JE:"Jersey",JO:"Jordan",KZ:"Kazakhstan",KE:"Kenya",KI:"Kiribati",XK:"Kosovo",KW:"Kuwait",KG:"Kyrgyzstan",LA:"Laos",LV:"Latvia",LB:"Lebanon",LS:"Lesotho",LR:"Liberia",LY:"Libya",LI:"Liechtenstein",LT:"Lithuania",LU:"Luxembourg",MO:"Macau",MK:"Macedonia",MG:"Madagascar",MW:"Malawi",MY:"Malaysia",MV:"Maldives",ML:"Mali",MT:"Malta",MH:"Marshall Islands",MR:"Mauritania",MU:"Mauritius",YT:"Mayotte",MX:"Mexico",FM:"Micronesia",MD:"Moldova",MC:"Monaco",MN:"Mongolia",ME:"Montenegro",MS:"Montserrat",MA:"Morocco",MZ:"Mozambique",MM:"Myanmar",NA:"Namibia",NR:"Nauru",NP:"Nepal",NL:"Netherlands",AN:"Netherlands Antilles",NC:"New Caledonia",NZ:"New Zealand",NI:"Nicaragua",NE:"Niger",NG:"Nigeria",NU:"Niue",KP:"North Korea",MP:"Northern Mariana Islands",NO:"Norway",OM:"Oman",XX:"Other",PK:"Pakistan",PW:"Palau",PS:"Palestine",PA:"Panama",PG:"Papua New Guinea",PY:"Paraguay",PE:"Peru",PH:"Philippines",PN:"Pitcairn",PL:"Poland",PT:"Portugal",PR:"Puerto Rico",QA:"Qatar",CG:"Republic of the Congo",RE:"Reunion",RO:"Romania",RU:"Russia",RW:"Rwanda",BL:"Saint Barthelemy",SH:"Saint Helena",KN:"Saint Kitts and Nevis",LC:"Saint Lucia",MF:"Saint Martin",PM:"Saint Pierre and Miquelon",VC:"Saint Vincent and the Grenadines",WS:"Samoa",SM:"San Marino",ST:"Sao Tome and Principe",SA:"Saudi Arabia",SN:"Senegal",RS:"Serbia",SC:"Seychelles",SL:"Sierra Leone",SG:"Singapore",SX:"Sint Maarten",SK:"Slovakia",SI:"Slovenia",SB:"Solomon Islands",SO:"Somalia",ZA:"South Africa",KR:"South Korea",SS:"South Sudan",ES:"Spain",LK:"Sri Lanka",SD:"Sudan",SR:"Suriname",SJ:"Svalbard and Jan Mayen",SZ:"Swaziland",SE:"Sweden",CH:"Switzerland",SY:"Syria",TW:"Taiwan",TJ:"Tajikistan",TZ:"Tanzania",TH:"Thailand",TG:"Togo",TK:"Tokelau",TO:"Tonga",TT:"Trinidad and Tobago",TN:"Tunisia",TR:"Turkey",TM:"Turkmenistan",TC:"Turks and Caicos Islands",TV:"Tuvalu",VI:"U.S. Virgin Islands",UG:"Uganda",UA:"Ukraine",AE:"United Arab Emirates",GB:"United Kingdom",US:"United States",UY:"Uruguay",UZ:"Uzbekistan",VU:"Vanuatu",VA:"Vatican",VE:"Venezuela",VN:"Vietnam",WF:"Wallis and Futuna",EH:"Western Sahara",YE:"Yemen",ZM:"Zambia",ZW:"Zimbabwe"};
+
+  var ALL_PLANS = ["growth","pro","business"];
+  // Some regions do not sell every tier — mainland China starts at Pro.
+  var PLAN_ORDER = ALL_PLANS.filter(function(k){
+    return (CONFIG.hidePlans || []).indexOf(k) === -1 && CONFIG.plans[k];
+  });
+  var CATS = ["marketing","utility","authentication"];
+  var CAT_META = {
+    marketing:      { key:"rMarketing", label:"Marketing messages",      color:"var(--blue)",  i:0 },
+    utility:        { key:"rUtility",   label:"Utility messages",        color:"var(--green)", i:1 },
+    authentication: { key:"rAuth",      label:"Authentication messages", color:"var(--pink)",  i:2 }
+  };
+  var PLAN_OFFSET = { growth:0, pro:3, business:6 };
+  var SERVICE_OFFSET = { growth:9, pro:10, business:11 };
+  function serviceRate(planKey, iso){
+    var row = RATES[iso];
+    return row ? row[SERVICE_OFFSET[planKey]] : 0;
+  }
+  function rateFor(planKey, cat, iso){
+    var row = RATES[iso];
+    if (!row) return 0;
+    return row[PLAN_OFFSET[planKey] + CAT_META[cat].i];
+  }
+
+  /* ------------------------------------------------------------------
+     Translations. LANGS holds only the languages this region ships with;
+     English is always the fallback and is captured from the markup at load,
+     so a missing key simply shows the English.
+     ------------------------------------------------------------------ */
+  var LANGS = {"es": {"agentsAi": "Agentes de IA de Astra que necesitas", "agentsAiHint": "Growth 1, Pro 2, Business ilimitado. Pide más de lo que permite el plan y queda descartado.", "and": "y", "aoBilled": "facturados en paquetes de 5", "aoBilled10": "facturados en paquetes de 10", "aoFree": "incluido en este plan", "aoInPlan": "incluido en {0}", "aoLearn": "Qué hace", "aoNoCharge": "Sin coste: {0} ya lo incluye.", "ao_apihigh": "API de alto volumen", "ao_apihigh_h": "Pro permite 60 llamadas API cada 10 segundos y Business 100; esto lo sube a 200.", "ao_apilimit": "Ampliación del límite mensual de API", "ao_apilimit_h": "Business incluye 20M de llamadas API al mes; esto duplica el tope hasta 40M.", "ao_blitz": "Blitz: 200 mensajes por segundo", "ao_blitz_h": "Velocidad de envío de hasta 200 mensajes por segundo, para envíos urgentes.", "ao_byoa": "BYOA — trae tu propio agente de IA", "ao_byoa_h": "Conecta un agente de IA externo, facturado por agente. Los agentes Astra vienen con el plan y no se cobran aquí.", "ao_ctwa": "Anuncios de clic a WhatsApp", "ao_ctwa_h": "Seguimiento y atribución de clics de anuncios de Facebook e Instagram, con panel de analítica y Google Ads. Gratis desde Pro.", "ao_forms": "Formularios", "ao_forms_h": "Pro incluye 2 formularios y Business 10; esto sube el tope a 25.", "ao_masking": "Enmascaramiento del número", "ao_masking_h": "Enmascara el número del cliente en la bandeja. Se contrata por cumplimiento.", "ao_opprivacy": "Privacidad del operador", "ao_opprivacy_h": "Oculta los datos de contacto del cliente a los operadores durante el chat.", "ao_opscope": "Alcance del operador", "ao_opscope_h": "Cada operador ve solo los chats que tiene asignados, no toda la bandeja compartida.", "ao_roundrobin": "Asignación de chats por turnos", "ao_roundrobin_h": "Reparte los chats entrantes de forma equitativa entre los agentes disponibles.", "b029": "Los primeros 1.000 mensajes de servicio al mes", "b030": "Conversaciones desde anuncios de clic a WhatsApp.", "b031": "Cambió el 1 de octubre de 2026:", "b042": "Los agentes de Astra vienen con el plan", "b043": "Una sola bolsa de créditos.", "b044": "Los créditos no se acumulan.", "b045": "Las recargas arrancan en 2.000.", "billedIn": "facturado en", "ccyBilling": "moneda de facturación", "chanInc": "En todos los planes, sin coste de plataforma adicional", "chanNote": "Esta calculadora cotiza WhatsApp. Los demás canales comparten la misma bandeja, automatizaciones y agentes Astra; pide por separado las tarifas de RCS y SMS.", "chanPaid": "También disponible, con cargo por mensaje", "copied": "Copiado — pégalo en tu correo", "copyFail": "No se pudo copiar", "csmLink": "Qué hace un CSM", "ctrlCcy": "Mostrar precios en", "ctrlCycle": "Ciclo de facturación", "ctrlDetail": "Detalles", "ctrlLang": "Idioma", "ctrlTheme": "Modo oscuro", "cycShown": "{0} · en {1}", "cycSub_annual": "plan con facturación anual", "cycSub_monthly": "plan con facturación mensual", "cycSub_quarterly": "plan con facturación trimestral", "cyc_annual": "Anual", "cyc_monthly": "Mensual", "cyc_quarterly": "Trimestral", "dg_addons": "Complementos", "dg_credits": "Créditos de Wati AI extra", "dg_messages": "Mensajes", "dg_numbers": "Números de WhatsApp adicionales", "dg_plan": "Cuota del plan", "dg_seats": "Usuarios adicionales", "dg_triggers": "Disparadores extra", "discApplies": "sobre todo el paquete: puedes cambiar cualquier línea de abajo", "discEff": "de la factura", "discLabel": "Descuento que puedes ofrecer", "discNet": "con descuento", "discOff": "Cedes", "discPerMonth": "al mes", "discYear": "cedido a lo largo de un año", "free": "Gratis", "fxAsOfDate": "13 de agosto de 2026", "fxBy": "tipos de {0}", "fxDated": "tipo del {0}", "fxLatest": "último tipo publicado", "fxLoading": "Buscando los tipos de cambio de hoy…", "fxOffline": "Sin tipos en vivo: se usan los de referencia del {0}. No cotices con estos.", "fxRefresh": "Actualizar tipos", "grpAgent": "Por agente de IA", "grpMonth": "Mensual, cuota fija", "grpRest": "Resto del mundo", "grpUser": "Por usuario, en paquetes de cinco", "grpUser10": "Por usuario, en paquetes de diez", "hintCountry": "En {0}, un mensaje de marketing a {1} cuesta {2} y uno de utilidad {3}. Cambia de país y se recalcula toda la factura.", "hintNumber1": "Un número. Cualquier plan lo cubre.", "hintNumbers": "{0} números: solo el plan Business lo permite, más {1} al mes por cada uno a partir del primero.", "hintSeatsOk": "Growth llega a {0}. Pro y Business incluyen {1}.", "hintSeatsOver": "Con {0} usuarios queda fuera Growth, que tiene un tope de {1}.", "langLabel": "Idioma", "lede": "Ocho preguntas rápidas. La factura se desglosa sola; luego eliges moneda y te la llevas en PDF.", "mixMsgs": "mensajes al mes", "mixNone": "Añade arriba tus volúmenes mensuales y aquí aparece la mezcla.", "mixSvc": "Servicio", "mixT": "Tu mezcla de mensajes", "notesH": "Lo que se da por supuesto aquí, para que lo revises.", "onbLink": "Onboarding dedicado", "pAllIn": "al mes, todo incluido", "pExtraSeats": "{0} usuarios extra {1}", "pIncluded": "Incluido en el plan", "pMsgs": "Mensajes {0}, marketing a {1}", "pPlan": "Plan {0}", "pSeatsFixed": "{0} usuarios incluidos, no se pueden añadir más", "pSeatsInc": "{0} usuarios incluidos", "pTrigOk": "{0} disparos, te sobran", "pTrigTop": "Recarga de disparos {0} (tramo de {1})", "pb1": "Chatbots y reglas por palabra clave ilimitados", "pb2": "80 mensajes por segundo en los envíos", "pb3": "20M llamadas API al mes, 100 cada 10 segundos", "pb4": "4 webhooks · 10 formularios", "pb5": "Integraciones ilimitadas · soporte prioritario y CSM dedicado", "pb6": "Round-robin, enmascarado de número y visibilidad de chats por operador, de serie", "perAgent": "por agente", "perMonth": "al mes", "perUser": "por usuario", "pg1": "2 chatbots, 30 reglas por palabra clave", "pg2": "20 mensajes por segundo en los envíos", "pg3": "10K llamadas API al mes, 30 cada 10 segundos", "pg4": "Sin webhooks ni formularios", "pg5": "2 integraciones · soporte por correo 24/5", "pp1": "Chatbots y reglas por palabra clave ilimitados", "pp2": "40 mensajes por segundo en los envíos", "pp3": "200K llamadas API al mes, 60 cada 10 segundos", "pp4": "2 webhooks · 2 formularios", "pp5": "5 integraciones · correo 24/7 y soporte por chat", "q1note": "WhatsApp cobra según el país al que pertenece el número de tu cliente, no según dónde esté tu empresa. Las tarifas cambian mucho de un mercado a otro, así que empieza por aquí.", "q7h": "IA, Astra y créditos", "q7n": "Astra viene con todos los planes. Los créditos son un saldo único; lo que exceda se cobra por tramos.", "q8h": "Complementos", "q8n": "Precios directos del tarifario de esta región. Los complementos por usuario se venden en paquetes de cinco: 8 operadores se facturan como 10.", "q8n10": "Precios directos de la tarifa de esta región. Los complementos por usuario se venden en paquetes de diez, así que 12 operadores se facturan como 20.", "rAddon": "{0} requiere {1} o superior.", "rAgents1": "Incluye {0} agente de Astra; pediste {1}.", "rAgentsN": "Incluye {0} agentes de Astra; pediste {1}.", "rAuth": "Mensajes de autenticación", "rCap": "Los envíos masivos tienen un tope de {0} al mes; tu volumen de marketing más utilidad es {1}.", "rCredits": "créditos de Wati AI", "rExtraCredits": "Créditos de Wati AI extra", "rExtraNumbers": "números de WhatsApp adicionales", "rExtraTriggers": "Disparadores de automatización extra", "rExtraUsers": "usuarios adicionales", "rMarketing": "Mensajes de marketing", "rMsgHead": "Mensajes — desde tu monedero de prepago", "rMsgTotal": "Subtotal del monedero", "rNumbers": "Admite un solo número de WhatsApp; necesitas {0}.", "rPlan": "plan", "rSeats": "Incluye {0} usuarios y no admite más; necesitas {1}.", "rService": "Mensajes de servicio", "rShopify": "Integración con Shopify", "rSubHead": "Suscripción — facturada en tu ciclo de plan", "rSubTotal": "Subtotal de suscripción", "rSvcFree": "Mensajes de servicio, cuota gratuita", "rTriggers": "disparadores", "rUsers": "usuarios", "rUtility": "Mensajes de utilidad", "rVoice": "Los agentes de voz son solo de Business.", "rcDate": "1 de octubre de 2026", "rcEffective": "Vigente desde el {0}.", "rcFolder": "Si el enlace abre una carpeta, elige el archivo que indica el botón.", "rcHead": "Las tarifas en las que se basan estas cifras", "rnInr": "Los precios del plan y por mensaje están en INR, así que no hay conversión. La única excepción es la integración con Shopify, que se factura en USD a 4,99 $ al mes.", "rnUsd": "En la tarifa, los precios por mensaje están en USD. Si el plan se factura en otra moneda, ambos se convierten a la moneda elegida arriba, al cambio de hoy.", "shopify": "Conectar Shopify", "shopifyHint": "Necesario para carrito abandonado, confirmación contra reembolso y avisos automáticos. 4,99 $ al mes en USD.", "slaLink": "SLA de soporte", "srCountry": "País en el que están tus clientes", "srDetail": "Mostrar las notas explicativas", "srMsgs": " mensajes al mes", "svcLower": "Los mensajes de servicio tienen su propio precio por país, menor que el de utilidad.", "svcSame": "En esta tarifa los mensajes de servicio se cobran al precio de utilidad.", "t001": "Calcula lo que WhatsApp te costará realmente cada mes.", "t002": "¿Dónde están tus clientes?", "t003": "¿Para qué usas WhatsApp?", "t004": "Fija cifras iniciales razonables. Todo sigue siendo editable.", "t005": "Promociones y campañas", "t006": "Atención al cliente", "t007": "Avisos de pedido y entrega", "t008": "Inicios de sesión y OTP", "t009": "Una mezcla de todo", "t010": "¿Cuántos números de WhatsApp?", "t011": "Un número basta para la mayoría. Números separados requieren Business, y cada extra se cobra al mes.", "t012": "Números conectados a Wati", "t013": "¿Cuántas personas necesitan acceso?", "t014": "Todo el que responda chats necesita una licencia. Growth incluye 3 y no admite ampliación a ningún precio.", "t015": "Miembros del equipo con acceso a Wati", "t016": "¿Cuántos mensajes al mes?", "t017": "WhatsApp cobra por mensaje entregado según la categoría, no por contacto. Reparte tu volumen mensual entre las tres que cuestan.", "t018": "Marketing", "t019": "Ofertas, lanzamientos, reactivación, carrito abandonado. Con diferencia, la categoría más cara.", "t020": "Utilidad", "t021": "Avisos de pedido, entrega, pago y cita: todo lo ligado a una transacción ya hecha.", "t022": "Autenticación", "t023": "Solo contraseñas de un solo uso y códigos de acceso.", "t024": "Mensajes de servicio al mes", "t025": "Respuestas libres que envías dentro de la ventana de 24 h. Se facturan por mensaje desde el 1 oct 2026, pasados los primeros 1.000 al mes. Lo entrante siempre es gratis.", "t026": "Qué ha cambiado", "t027": "Lo que sigue sin costarte nada", "t028": "Todo lo que el cliente te envía es gratis.", "t029": ", por cuenta de WhatsApp Business, con reinicio mensual.", "t030": "Gratis hoy. Meta ampliará la ventana a 7 días; fecha por confirmar.", "t031": "los mensajes de servicio pasan a cobrarse por mensaje, y las plantillas de utilidad dentro de la ventana de 24 h vuelven a cobrarse.", "t032": "¿Cuánto funciona en automático?", "t033": "Se cuenta cada vez que una automatización tuya se activa para un cliente: chatbot, palabra clave, regla de enrutamiento, secuencia o Flow. Si se agotan, las automatizaciones paran hasta que recargues. Los extras se cobran por tramos.", "t034": "Cómo se cuentan y se cobran los disparadores", "t035": "Disparadores de automatización al mes", "t036": "Aproximadamente uno por cliente que inicia un chat automatizado, más uno por seguimiento automático. Las acciones por API no cuentan.", "t039": "Créditos de Wati AI al mes", "t040": "Un saldo compartido entre Wati AI y Astra. Gratis al mes: 2.000 Growth, 5.000 Pro, 20.000 Business. Deja 0 si el equipo no usará IA.", "t041": "Astra viene incluido y los créditos son ahora un solo saldo", "t042": "— 1 en Growth, 2 en Pro, ilimitados en Business. La IA de voz es solo Business. Sin suscripción aparte de Astra.", "t043": "un mismo saldo cubre Wati AI y Astra. Los antiguos créditos de AI Co-pilot están retirados.", "t044": "caducan en tu fecha de facturación y vuelven a la cantidad del plan. Las recargas tampoco se acumulan.", "t045": "los paquetes de 1.000 créditos ya no existen y el precio por crédito se ha reducido a la mitad.", "t046": "Cómo funcionan los planes de paquete y los créditos de IA, incluida la acumulación", "t047": "Coste mensual estimado", "t048": "Wati Pro", "t049": "Mejor opción", "t050": "Growth", "t051": "Pro", "t052": "Business", "t053": "Total al mes", "t054": "Promedio por mensaje", "t055": "Anual", "t056": "Guardar como PDF", "t057": "Copiar para correo", "t058": "Los mismos requisitos, con precio en los tres planes", "t059": "Un plan más barato no siempre da una factura más barata al contar usuarios, recargas y tarifas por plan.", "t060": "Los precios de plan, licencias y complementos son los publicados. Las tarifas por mensaje salen del tarifario de esta región, en vigor desde el 1 de octubre de 2026, según el país del destinatario. Los niveles superiores son más baratos por mensaje.", "t061": "Los tarifarios están enlazados en la pregunta 1: abre la fuente en la llamada en vez de citar de memoria.", "t062": "La estimación elige el plan más barato que encaja. Fija un plan para cotizar más alto; lo que no cubra queda fuera del total y se señala.", "t063": "El límite de 15.000 difusiones de Growth se compara con marketing más utilidad. La autenticación se activa por API, uno a uno, y no cuenta.", "t064": "Disparadores incluidos: 1.000 / 2.000 / 5.000. Los extras van por tramos: pagas el primero que te cubre.", "t065": "Créditos de Wati AI incluidos: 2.000 / 5.000 / 20.000, un saldo entre Wati AI y Astra. Los extras van por tramos y no se acumulan.", "t066": "Los agentes Astra vienen con el plan: 1 / 2 / ilimitados, IA de voz solo en Business. No es una suscripción aparte.", "t067": "Los números extra requieren Business. Shopify son 4,99 $ al mes en USD, así que varía con el cambio.", "t068": "Los cargos por mensajes se descuentan de un monedero de prepago, independiente de la factura de la suscripción.", "t069": "No se modelan los descuentos por volumen por encima de alrededor de un millón de mensajes al mes. Tampoco se incluyen: onboarding y configuración a medida, gestión técnica de cuenta y servicios profesionales.", "t070": "Estimación mensual", "t071": "Los tipos de cambio vienen de Frankfurter, con Exchange Rate API como alternativa. Ambos publican una vez al día, así que es un tipo de referencia diario, no de operación. Wati factura en ; el tipo de tu banco ese día variará un poco.", "tagNoFit": "No encaja", "tagQuoting": "Cotizando", "toolname": "Calculadora de costes de WhatsApp", "vCheapest": "<b>{0}</b> es el plan más barato que cumple tus requisitos.", "vMsgShare": "Los mensajes son el {0}% del coste; la suscripción es lo de menos.", "vNone": "Ningún plan estándar cubre esto, así que hace falta una cotización a medida. Se muestra el más cercano.", "vOut1": "{0} queda fuera: {1}", "vOutMany": "{0} quedan fuera{1}.", "vPayg": "A este volumen, {0} puede salir más barato que cualquier suscripción; merece una mirada.", "vPinned": "Has fijado <b>{0}</b>.", "vPinnedBest": "También es el plan más barato que encaja.", "vPinnedLess": "El más barato que encaja es <b>{0}</b> a {1}, así que este cuesta {2} menos al mes.", "vPinnedMore": "El más barato que encaja es <b>{0}</b> a {1}, así que este cuesta {2} más al mes.", "vTierUp": "{0} también cumple, pero cuesta {1} más al mes: sus tarifas por mensaje son más altas y a este volumen eso pesa más que la cuota del plan.", "voice": "Necesito un agente de IA de voz", "voiceHint": "La IA de voz es exclusiva de Business: marcar esto descarta Growth y Pro.", "wbPlain": "No se pudieron cargar los tipos de cambio en vivo, así que el total usa tipos de referencia. Pulsa Actualizar tipos en el panel antes de cotizar.", "wbUsd": "No se pudieron cargar los tipos de cambio en vivo. Los mensajes se facturan en USD, así que el total usa un tipo de referencia. Pulsa Actualizar tipos en el panel antes de cotizar.", "whNote": "Growth cubre 2 chatbots y 30 reglas por palabra clave. Los chatbots ilimitados, los pasos con webhook y los conectores externos empiezan en Pro.", "hintSeatsSplit": "Growth llega a {0}. Pro incluye {1}, Business {2}.", "hintSeatsOverSplit": "Con {0} usuarios queda fuera Growth, con tope de {1}. Business incluye {2}.", "hintSeatsNoGrowth": "Pro incluye {0}, Business {1}.", "hintSeatsNoGrowthSame": "Pro y Business incluyen {0} cada uno.", "macTitle": "¿Con cuántos contactos vas a hablar de verdad?", "macNote": "Un contacto activo mensual es cualquier persona que te escribe, o a la que responde un operador, una automatización o un agente de IA, durante el mes de facturación. Guardar contactos es gratis, y quien solo recibe una difusión y nunca responde no cuenta. El conteo se reinicia en tu fecha de facturación.", "macLabel": "Contactos activos mensuales", "macEx": "Cálculo rápido: los contactos únicos que tu equipo atiende en un día normal, por tus días laborables. 50 al día en 22 días son unos 1.100.", "macFits": "{0} cabe en {1}.", "macNone": "{0} supera todos los planes publicados. Enterprise lo dimensiona tu CSM.", "rMacHard": "Incluye {0} contactos activos al mes y no admite ampliación; necesitas {1}.", "rMacCeil": "Llega como máximo a {0} contactos activos al mes incluso con add-ons; necesitas {1}.", "rMacPacks": "{0} contactos activos adicionales", "dg_macs": "Contactos activos adicionales", "regionNote": "Facturación mexicana en pesos. Usa la tarifa LATAM."}};
+  var LANG_NAMES = { en:"English", es:"Espa\u00f1ol", pt:"Portugu\u00eas",
+    id:"Bahasa Indonesia", ms:"Bahasa Melayu", "zh-Hans":"\u7b80\u4f53\u4e2d\u6587",
+    "zh-Hant":"\u7e41\u9ad4\u4e2d\u6587", de:"Deutsch", fr:"Fran\u00e7ais" };
+  var LANG = "en";
+  var EN = {}, EN_PAD = {};
+
+  function T(key, fallback){
+    var d = LANGS[LANG];
+    if (d && d[key]) return d[key];
+    if (EN[key]) return EN[key];
+    return fallback === undefined ? key : fallback;
+  }
+
+  function directNodes(el){
+    var out = [];
+    for (var i = 0; i < el.childNodes.length; i++){
+      if (el.childNodes[i].nodeType === 3) out.push(el.childNodes[i]);
+    }
+    return out;
+  }
+  function setDirect(el, txt){
+    var n = directNodes(el);
+    if (!n.length){ el.appendChild(document.createTextNode(txt)); return; }
+    n[0].nodeValue = txt;
+    for (var i = 1; i < n.length; i++) n[i].nodeValue = "";
+  }
+
+  function captureEnglish(){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function(el){
+      var k = el.getAttribute("data-i18n");
+      if (EN[k] === undefined){
+        var t = directNodes(el).map(function(n){ return n.nodeValue; }).join("");
+        EN[k] = t.replace(/\s+/g, " ").trim();
+        EN_PAD[k] = [/^\s/.test(t) ? " " : "", /\s$/.test(t) ? " " : ""];
+      }
+    });
+  }
+
+  // Translations reorder words, so runtime strings interpolate by position
+  // rather than by concatenation.
+  function F(key, fallback){
+    var t = T(key, fallback), a = arguments;
+    return t.replace(/\{(\d)\}/g, function(_, i){
+      var v = a[Number(i) + 2];
+      return v === undefined ? "" : String(v);
+    });
+  }
+
+  // Controls built once at load re-render themselves when the language changes.
+  var LANG_HOOKS = [];
+
+  var HEADLINE_HTML = null;
+  function applyLang(){
+    document.documentElement.lang = LANG;
+    var h1 = $("headline");
+    if (h1){
+      if (HEADLINE_HTML === null) HEADLINE_HTML = h1.innerHTML;
+      if (LANG === "en") h1.innerHTML = HEADLINE_HTML;
+      else h1.textContent = T("t001", "");
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-group]"), function(el){
+      el.label = el.getAttribute("data-i18n-group") === "home"
+        ? CONFIG.region : T("grpRest", "Everywhere else");
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function(el){
+      if (el.getAttribute("data-i18n-skip")) return;
+      var k = el.getAttribute("data-i18n");
+      var pad = EN_PAD[k] || ["", ""];
+      setDirect(el, pad[0] + T(k, EN[k]) + pad[1]);
+    });
+    rebuildAddons();
+    rebuildCcyOptions();
+    LANG_HOOKS.forEach(function(f){ try { f(); } catch(e){} });
+    render();
+  }
+
+  // Astra AI agents included with each plan. null means unlimited.
+  var ASTRA = { growth:1, pro:2, business:null };
+
+  var PRESETS = {
+    marketing:{ mkt:20000, util:2000,  auth:0,     svc:500,   agents:3, trig:1500, ai:0,     mac:600,  advanced:false },
+    support:  { mkt:2000,  util:8000,  auth:0,     svc:12000, agents:8, trig:9000, ai:6000,  mac:2200, advanced:true  },
+    orders:   { mkt:3000,  util:20000, auth:0,     svc:3000,  agents:4, trig:6000, ai:0,     mac:1400, advanced:false },
+    otp:      { mkt:0,     util:2000,  auth:20000, svc:500,   agents:2, trig:1000, ai:0,     mac:300,  advanced:false },
+    mixed:    { mkt:15000, util:10000, auth:0,     svc:2000,  agents:5, trig:4000, ai:0,     mac:1200, advanced:false }
+  };
+
+  var state = {
+    country: (CONFIG.defaultCountry && RATES[CONFIG.defaultCountry]) ? CONFIG.defaultCountry
+             : (RATES["IN"] ? "IN" : Object.keys(RATES)[0]),
+    useCase:"mixed", numbers:1, agents:3, macs:1200,
+    mkt:15000, util:10000, auth:0, service:0,
+    triggers:2000, aiCredits:0,
+    needShopify:false,
+    aiAgents:1, needVoice:false, addons:{},
+    discount:0, discOverride:{},
+    cycle:"annual",
+    planPick:"auto",
+    outCcy: CONFIG.defaultOutCcy || CONFIG.planCcy
+  };
+
+  /* ============================================================
+     Currency. Two amount pools:
+       plan  — priced in CONFIG.planCcy (EUR / GBP / USD)
+       usd   — messages and Shopify, always USD
+     Everything is converted into state.outCcy for display.
+     ============================================================ */
+  var FX = { rates:null, live:false, when:null, source:null };
+
+  function rateOf(ccy){
+    var r = FX.rates || CONFIG.fallbackRates;
+    return r[ccy];
+  }
+  function conv(amount, from, to){
+    if (!amount) return 0;
+    if (from === to) return amount;
+    var rf = rateOf(from), rt = rateOf(to);
+    if (!rf || !rt) return NaN;
+    return amount / rf * rt;                 // rates are per 1 USD
+  }
+  function ccyAvailable(ccy){ return !!rateOf(ccy); }
+  // Three pools: plan currency, USD (Shopify), and the rate-card currency.
+  function poolCcy(tag){
+    if (tag === "plan") return CONFIG.planCcy;
+    if (tag === "rate") return CONFIG.rateCcy;
+    return "USD";
+  }
+
+  function money(amount, from){
+    var v = conv(amount, from || CONFIG.planCcy, state.outCcy);
+    if (isNaN(v)) return "—";
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style:"currency", currency:state.outCcy,
+        minimumFractionDigits:0, maximumFractionDigits:0
+      }).format(Math.round(v));
+    } catch(e){ return state.outCcy + " " + Math.round(v).toLocaleString(); }
+  }
+  function moneyFine(amount, from){
+    var v = conv(amount, from || CONFIG.planCcy, state.outCcy);
+    if (isNaN(v)) return "—";
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style:"currency", currency:state.outCcy,
+        minimumFractionDigits:4, maximumFractionDigits:4
+      }).format(v);
+    } catch(e){ return state.outCcy + " " + v.toFixed(4); }
+  }
+  function msgRate(r){
+    return CONFIG.rateSymbol + r.toFixed(5).replace(/0+$/,"").replace(/\.$/,"");
+  }
+  function count(n){ return n.toLocaleString("en-US"); }
+  function $(id){ return document.getElementById(id); }
+
+  /* ---------------- live rates ---------------- */
+  function applyRates(map, source, url, asOf){
+    var clean = {};
+    Object.keys(map).forEach(function(k){
+      var v = map[k];
+      if (typeof v === "number" && isFinite(v) && v > 0) clean[k.toUpperCase()] = v;
+    });
+    clean.USD = 1;
+    FX.rates = clean; FX.live = true; FX.when = new Date();
+    FX.source = source; FX.url = url; FX.asOf = asOf || null;
+  }
+
+  // Two independent public endpoints, both key-free, HTTPS and CORS-enabled, so
+  // this works from any static host. cache:"no-store" plus a cache-buster makes
+  // the Refresh button actually re-request instead of replaying a cached body.
+  function fetchRates(){
+    renderFx("loading");
+    var bust = "_=" + Date.now();
+    var opts = { cache:"no-store", mode:"cors" };
+
+    var primary = "https://api.frankfurter.dev/v2/rates?base=USD&" + bust;
+    var secondary = "https://open.er-api.com/v6/latest/USD?" + bust;
+
+    fetch(primary, opts).then(function(r){
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    }).then(function(j){
+      if (!Array.isArray(j) || !j.length) throw new Error("shape");
+      var map = {}, newest = null;
+      j.forEach(function(row){
+        if (row && row.quote) map[row.quote] = row.rate;
+        if (row && row.date && (!newest || row.date > newest)) newest = row.date;
+      });
+      if (!map.EUR) throw new Error("empty");
+      applyRates(map, "Frankfurter", "https://frankfurter.dev", newest);
+      rebuildCcyOptions(); render();
+    }).catch(function(){
+      fetch(secondary, opts).then(function(r){
+        if (!r.ok) throw new Error("http " + r.status);
+        return r.json();
+      }).then(function(j){
+        if (!j || !j.rates) throw new Error("shape");
+        var d = j.time_last_update_utc
+          ? new Date(j.time_last_update_utc).toISOString().slice(0,10) : null;
+        applyRates(j.rates, "Exchange Rate API", "https://www.exchangerate-api.com", d);
+        rebuildCcyOptions(); render();
+      }).catch(function(){
+        FX.rates = null; FX.live = false; FX.source = null; FX.asOf = null;
+        rebuildCcyOptions(); render();
+      });
+    });
+  }
+
+  function renderFx(mode){
+    var el = $("fxline");
+    if (mode === "loading"){ el.innerHTML = T("fxLoading","Fetching today\u2019s exchange rates\u2026"); return; }
+    var one, per;
+    if (state.outCcy === "USD"){
+      one = "1 USD"; per = "";
+    } else {
+      var v = conv(1, "USD", state.outCcy);
+      per = isNaN(v) ? "" : "1 USD = <b>" + v.toLocaleString(undefined,{maximumFractionDigits:4}) + " " + state.outCcy + "</b>";
+    }
+    var bits = [];
+    if (per) bits.push(per);
+    if (FX.live){
+      // These feeds publish once a day, so show the rate's own date rather than
+      // implying a live tick. Refresh is for recovering a failed load or picking
+      // up the next daily publication.
+      bits.push(FX.asOf ? F("fxDated","rate dated {0}", FX.asOf) : T("fxLatest","latest published rate"));
+      bits.push(F("fxBy", "rates by {0}",
+        '<a href="' + FX.url + '" target="_blank" rel="noopener">' + FX.source + '</a>'));
+    } else {
+      bits.push('<span class="fxbad">' + F("fxOffline",
+        "Live rates unavailable \u2014 offline reference rates from {0} in use. Do not quote from this.",
+        T("fxAsOfDate", CONFIG.fallbackAsOf)) + '</span>');
+    }
+    el.innerHTML = bits.join(" \u00b7 ") + ' <button type="button" id="fxRetry">' +
+      T("fxRefresh","Refresh rates") + '</button>';
+    $("fxRetry").addEventListener("click", fetchRates);
+  }
+
+  /* ============================================================
+     The maths
+     ============================================================ */
+  // Utility inside the 24-hour window became billable on 1 October 2026, so the
+  // whole utility volume is charged. Service messages are billable beyond the
+  // free monthly allowance.
+  function billableVolumes(){
+    var freeService = Math.min(state.service, CONFIG.serviceFree);
+    return {
+      marketing: state.mkt,
+      utility: state.util,
+      authentication: state.auth,
+      service: state.service - freeService,
+      freeService: freeService,
+      total: state.mkt + state.util + state.auth + state.service
+    };
+  }
+
+  function estimate(planKey){
+    var plan = CONFIG.plans[planKey];
+    var vol = billableVolumes();
+    var subLines = [], msgLines = [], reasons = [];
+    var cap = (plan.broadcastCap === null) ? Infinity : plan.broadcastCap;
+    var maxNumbers = (plan.numbers === null) ? Infinity : plan.numbers;
+
+    if (state.agents > plan.seats && plan.extraSeat === null){
+      reasons.push(F("rSeats", "Includes {0} users with no way to add more \u2014 you need {1}.",
+        plan.seats, state.agents));
+    }
+    if (state.numbers > maxNumbers){
+      reasons.push(F("rNumbers", "Supports one WhatsApp number; you need {0}.", state.numbers));
+    }
+    // MAC bundle regions size the plan on active contacts. Growth is a hard
+    // ceiling with no top-up; Pro and Business buy packs of 250 up to their own.
+    var macLine = null;
+    if (CONFIG.mac){
+      var M = CONFIG.mac, mBase = M.base[planKey], mCeil = M.ceil[planKey];
+      if (state.macs > mCeil){
+        reasons.push(F(mCeil === mBase ? "rMacHard" : "rMacCeil",
+          mCeil === mBase
+            ? "Includes {0} active contacts a month and cannot be topped up; you need {1}."
+            : "Tops out at {0} active contacts a month even with add-ons; you need {1}.",
+          count(mCeil), count(state.macs)));
+      } else if (state.macs > mBase){
+        var packs = Math.ceil((state.macs - mBase) / M.pack);
+        macLine = { ccy:"plan", grp:"macs", amount: packs * M.price, extra:true,
+          name: F("rMacPacks", "{0} extra active contacts", count(packs * M.pack)),
+          sub: count(packs) + " \u00d7 " + count(M.pack) + " \u00d7 " + money(M.price) };
+      }
+    }
+    // The broadcast cap covers campaign sends. Authentication is API-triggered
+    // one-to-one, so it doesn't count towards it.
+    var broadcastVolume = state.mkt + state.util;
+    if (broadcastVolume > cap){
+      reasons.push(F("rCap", "Broadcasts are capped at {0} a month; your marketing plus utility volume is {1}.",
+        count(cap), count(broadcastVolume)));
+    }
+    // Astra agents ship with the plan: 1 on Growth, 2 on Pro, unlimited on Business.
+    var agentCap = ASTRA[planKey];
+    if (agentCap !== null && state.aiAgents > agentCap){
+      reasons.push(F(agentCap === 1 ? "rAgents1" : "rAgentsN",
+        agentCap === 1 ? "Comes with {0} Astra AI agent; you asked for {1}."
+                       : "Comes with {0} Astra AI agents; you asked for {1}.",
+        agentCap, state.aiAgents));
+    }
+    if (state.needVoice && planKey !== "business"){
+      reasons.push(T("rVoice", "Voice AI agents are Business only."));
+    }
+    // Each add-on can only be bought from a given plan upward.
+    (CONFIG.addons || []).forEach(function(a){
+      if (!state.addons[a.k]) return;
+      var need = a.minPlan || "growth";
+      if (PLAN_RANK[planKey] < PLAN_RANK[need]){
+        reasons.push(F("rAddon", "{0} needs {1} or above.",
+          T("ao_" + a.k, a.label), CONFIG.plans[need].label));
+      }
+    });
+
+    var base = plan.prices[state.cycle];
+    subLines.push({ ccy:"plan", grp:"plan", amount:base, name: plan.label + " " + T("rPlan","plan"),
+      sub: plan.seats + " " + T("rUsers","users") + " \u00b7 " + count(plan.triggers) + " " +
+           T("rTriggers","triggers") + " \u00b7 " + count(plan.aiCredits) + " " + T("rCredits","Wati AI credits") });
+
+    var extraSeats = Math.max(0, state.agents - plan.seats);
+    if (extraSeats > 0 && plan.extraSeat !== null){
+      subLines.push({ ccy:"plan", grp:"seats", amount: extraSeats * plan.extraSeat, extra:true,
+        name: extraSeats + " " + T("rExtraUsers","extra users"),
+        sub: count(extraSeats) + " \u00d7 " + money(plan.extraSeat) });
+    }
+
+    if (macLine) subLines.push(macLine);
+
+    var extraNumbers = Math.max(0, state.numbers - 1);
+    if (extraNumbers > 0 && maxNumbers === Infinity){
+      subLines.push({ ccy:"plan", grp:"numbers", amount: extraNumbers * CONFIG.extraNumber, extra:true,
+        name: extraNumbers + " " + T("rExtraNumbers","extra WhatsApp numbers"),
+        sub: count(extraNumbers) + " \u00d7 " + money(CONFIG.extraNumber) });
+    }
+
+    var trigBand = band(CONFIG.sessionTiers, Math.max(0, state.triggers - plan.triggers), null);
+    if (trigBand.price > 0){
+      subLines.push({ ccy:"plan", grp:"triggers", amount: trigBand.price, extra:true,
+        name: T("rExtraTriggers","Extra automation triggers"),
+        sub: count(trigBand.need) + " over the included " + count(plan.triggers) +
+             " \u2014 " + count(trigBand.size) + " band" + (trigBand.over ? ", top band" : "") });
+    }
+
+    var aiBand = band(CONFIG.aiTiers, Math.max(0, state.aiCredits - plan.aiCredits), CONFIG.aiTop);
+    if (aiBand.price > 0){
+      subLines.push({ ccy:"plan", grp:"credits", amount: aiBand.price, extra:true,
+        name: T("rExtraCredits","Extra Wati AI credits"),
+        sub: count(aiBand.need) + " over the included " + count(plan.aiCredits) +
+             " \u2014 " + count(aiBand.size) + " band" + (aiBand.over ? "+, top band" : "") });
+    }
+
+    addonLines(planKey).forEach(function(l){ subLines.push(l); });
+
+    if (state.needShopify){
+      subLines.push({ ccy:"USD", grp:"addons", amount: CONFIG.shopifyUsd, extra:true,
+        name: T("rShopify","Shopify integration"), sub:"$4.99 a month, billed in USD" });
+    }
+
+    CATS.forEach(function(cat){
+      var v = vol[cat];
+      if (!v) return;
+      var r = rateFor(planKey, cat, state.country);
+      msgLines.push({ ccy:"rate", grp:"messages", amount: v * r, cat:cat,
+        name: T(CAT_META[cat].key, CAT_META[cat].label),
+        sub: count(v) + " \u00d7 " + msgRate(r) });
+    });
+    if (state.service > 0){
+      var sr = serviceRate(planKey, state.country);
+      if (vol.freeService > 0){
+        msgLines.push({ ccy:"rate", amount:0, free:true,
+          name: T("rSvcFree","Service messages, free allowance"), sub: count(vol.freeService) + " of " + count(CONFIG.serviceFree) });
+      }
+      if (vol.service > 0){
+        msgLines.push({ ccy:"rate", grp:"messages", amount: vol.service * sr, cat:"service",
+          name: T("rService","Service messages"), sub: count(vol.service) + " \u00d7 " + msgRate(sr) });
+      }
+    }
+
+    // Subtotals kept per source currency, converted only for display.
+    function sum(lines, ccy){
+      return lines.reduce(function(s,l){ return s + (l.ccy === ccy ? l.amount : 0); }, 0);
+    }
+    var subPlan = sum(subLines, "plan"), subUsd = sum(subLines, "USD");
+    var msgRaw  = sum(msgLines, "rate");
+
+    var totalOut = conv(subPlan, CONFIG.planCcy, state.outCcy)
+                 + conv(subUsd, "USD", state.outCcy)
+                 + conv(msgRaw, CONFIG.rateCcy, state.outCcy);
+
+    return {
+      key:planKey, plan:plan, subLines:subLines, msgLines:msgLines, reasons:reasons,
+      eligible: reasons.length === 0,
+      subPlan:subPlan, subUsd:subUsd, msgRaw:msgRaw,
+      subOut: conv(subPlan, CONFIG.planCcy, state.outCcy) + conv(subUsd, "USD", state.outCcy),
+      msgOut: conv(msgRaw, CONFIG.rateCcy, state.outCcy),
+      totalOut: totalOut,
+      platformOut: conv(base, CONFIG.planCcy, state.outCcy),
+      seatOut: conv(extraSeats * (plan.extraSeat || 0), CONFIG.planCcy, state.outCcy),
+      volumes:vol, extraSeats:extraSeats, trigBand:trigBand, aiBand:aiBand,
+      marketingRate: rateFor(planKey, "marketing", state.country)
+    };
+  }
+
+  /* ------------------------------------------------------------------
+     Banded pricing. The rate card sells extra automation triggers and extra
+     Wati AI credits in bands, not per unit: you buy the first band that
+     covers what you need and pay that band's price.
+     ------------------------------------------------------------------ */
+  function band(tiers, need, topPrice){
+    if (need <= 0) return { need:0, size:0, price:0, over:false };
+    for (var i = 0; i < tiers.length; i++){
+      if (need <= tiers[i][0]) return { need:need, size:tiers[i][0], price:tiers[i][1], over:false };
+    }
+    var last = tiers[tiers.length - 1];
+    return { need:need, size:last[0], price:(topPrice == null ? last[1] : topPrice), over:true };
+  }
+
+  /* Per-user add-ons are sold in packs of five. Eight users is two packs, so
+     ten seats are billed; the minimum purchase is one pack. */
+  var ADDON_PACK = CONFIG.addonPack || 5;
+  function packWord(){
+    return ADDON_PACK === 10 ? T("aoBilled10","billed in packs of 10")
+                             : T("aoBilled","billed in packs of 5");
+  }
+  function addonSeats(qty){
+    return Math.ceil(Math.max(qty, ADDON_PACK) / ADDON_PACK) * ADDON_PACK;
+  }
+  function addonFree(a, planKey){
+    return !!(a.free && a.free.indexOf(planKey) !== -1);
+  }
+  var PLAN_RANK = { growth:0, pro:1, business:2 };
+
+  /* ------------------------------------------------------------------
+     Discounts. One headline percentage covers the whole bill; any single
+     line can be overridden, so 10% overall with 20% on extra users and
+     numbers is one headline figure plus two overrides.
+     ------------------------------------------------------------------ */
+  var DISC_GROUPS = [
+    { k:"plan",     label:"Plan fee" },
+    { k:"seats",    label:"Extra users" },
+    { k:"macs",     label:"Extra active contacts" },
+    { k:"numbers",  label:"Extra WhatsApp numbers" },
+    { k:"triggers", label:"Extra automation triggers" },
+    { k:"credits",  label:"Extra Wati AI credits" },
+    { k:"addons",   label:"Add-ons" },
+  ];
+  // Message charges come out of the prepaid wallet at rate-card cost, so they
+  // are not part of the discountable package and get no row.
+  var DISC_MSG = "messages";
+  function discFixed(g){
+    for (var i = 0; i < DISC_GROUPS.length; i++){
+      if (DISC_GROUPS[i].k === g) return !!DISC_GROUPS[i].fixed;
+    }
+    return false;
+  }
+  function discPct(g){
+    if (discFixed(g)) return 0;
+    var o = state.discOverride[g];
+    return (o === undefined || o === null) ? state.discount : o;
+  }
+
+  function addonLines(planKey){
+    var out = [];
+    (CONFIG.addons || []).forEach(function(a){
+      var v = state.addons[a.k];
+      if (!v) return;
+      var ccy = a.ccy === "USD" ? "USD" : "plan";
+      if (addonFree(a, planKey)){
+        out.push({ ccy:ccy, grp:"addons", amount:0, extra:true, addon:true, free:true,
+          name: T("ao_" + a.k, a.label), sub: T("aoFree","included on this plan") });
+      } else if (a.unit === "agent"){
+        out.push({ ccy:ccy, grp:"addons", amount: a.p * v, extra:true, addon:true,
+          name: T("ao_" + a.k, a.label),
+          sub: count(v) + " \u00d7 " + money(a.p, a.ccy) + " " + T("perAgent","an agent") });
+      } else if (a.unit === "user"){
+        var seats = addonSeats(v);
+        out.push({ ccy:ccy, grp:"addons", amount: a.p * seats, extra:true, addon:true,
+          name: T("ao_" + a.k, a.label),
+          sub: count(v) + " " + T("rUsers","users") + " \u2192 " + count(seats) + " " +
+               packWord() + " \u00d7 " + money(a.p, a.ccy) });
+      } else {
+        out.push({ ccy:ccy, grp:"addons", amount: a.p, extra:true, addon:true,
+          name: T("ao_" + a.k, a.label), sub: money(a.p, a.ccy) + " " + T("perMonth","a month") });
+      }
+    });
+    return out;
+  }
+
+  function recommend(all){
+    var ok = PLAN_ORDER.map(function(k){ return all[k]; }).filter(function(e){ return e.eligible; });
+    if (ok.length) return ok.sort(function(a,b){ return a.totalOut - b.totalOut; })[0];
+    return all.business;
+  }
+
+  function fmtIn(v, ccy){
+    if (isNaN(v)) return "\u2014";
+    try {
+      return new Intl.NumberFormat(undefined,{style:"currency",currency:ccy,
+        minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(v));
+    } catch(e){ return ccy + " " + Math.round(v).toLocaleString(); }
+  }
+
+  function fmtOut(v){
+    if (isNaN(v)) return "—";
+    try {
+      return new Intl.NumberFormat(undefined,{style:"currency",currency:state.outCcy,
+        minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(v));
+    } catch(e){ return state.outCcy + " " + Math.round(v).toLocaleString(); }
+  }
+
+  // The after-discount total for any plan, so the plan buttons can show it too.
+  function netTotalOf(e){
+    var g = {};
+    e.subLines.concat(e.msgLines).forEach(function(l){
+      var k = l.grp || "plan";
+      g[k] = (g[k] || 0) + conv(l.amount, poolCcy(l.ccy), state.outCcy);
+    });
+    var off = 0;
+    DISC_GROUPS.forEach(function(G){
+      var base = g[G.k] || 0, pct = discPct(G.k);
+      if (base > 0 && pct > 0) off += base * pct / 100;
+    });
+    return e.totalOut - off;
+  }
+
+  /* ============================================================
+     Render
+     ============================================================ */
+  var lastGrand = null;
+
+  function render(){
+    var all = {};
+    PLAN_ORDER.forEach(function(k){ all[k] = estimate(k); });
+    var best = recommend(all);
+    var pick = (state.planPick === "auto") ? best : all[state.planPick];
+    renderAddonPrices(pick.key);
+
+    var cname = NAMES[state.country] || state.country;
+    $("countryHint").innerHTML = F("hintCountry",
+      "On {0}, marketing to {1} costs {2} a message and utility {3}. Switch country and the whole bill reprices.",
+      pick.plan.label, cname,
+      msgRate(rateFor(pick.key,"marketing",state.country)),
+      msgRate(rateFor(pick.key,"utility",state.country)));
+    $("numbersHint").textContent = state.numbers > 1
+      ? F("hintNumbers", "{0} numbers \u2014 only the Business plan supports this, plus {1} a month each beyond the first.",
+          state.numbers, money(CONFIG.extraNumber))
+      : T("hintNumber1", "One number. Any plan can do this.");
+    $("agentsHint").textContent = seatHint();
+    renderMac();
+
+    $("planName").textContent = "Wati " + pick.plan.label;
+    $("verdict").innerHTML = (state.planPick === "auto")
+      ? verdictText(pick, all)
+      : pinnedVerdict(pick, best);
+    // Each plan button carries its own total, so the step up is visible at a glance.
+    Array.prototype.forEach.call($("planPick").children, function(b){
+      b.setAttribute("aria-pressed", String(b.dataset.plan === state.planPick));
+      var tag = b.querySelector("small");
+      if (!tag) return;
+      var e = b.dataset.plan === "auto" ? best : all[b.dataset.plan];
+      if (!e){ tag.textContent = ""; return; }
+      tag.textContent = fmtOut(netTotalOf(e));
+      tag.className = e.eligible ? "" : "no";
+      b.title = e.eligible ? "" : e.reasons.join(" ");
+    });
+    renderPinned(pick, best);
+
+    var wb = $("warnbar");
+    if (!FX.live && state.outCcy !== CONFIG.planCcy){
+      wb.hidden = false;
+      wb.textContent = T("wbPlain", "Live exchange rates could not be loaded, so this total uses static reference rates. Use Refresh rates in the quote panel before quoting.");
+    } else if (!FX.live && CONFIG.rateCcy !== CONFIG.planCcy){
+      wb.hidden = false;
+      wb.textContent = T("wbUsd", "Live exchange rates could not be loaded. Message charges are billed in USD, so the total uses a static reference rate. Use Refresh rates in the quote panel before quoting.");
+    } else { wb.hidden = true; }
+
+    var box = $("lines");
+    box.innerHTML = "";
+    addGroup(box, T("rSubHead","Subscription — billed on your plan cycle"), pick.subLines, pick.subOut,
+             T("rSubTotal","Subscription subtotal"));
+    addGroup(box, T("rMsgHead","Messages — from your prepaid wallet"), pick.msgLines, pick.msgOut,
+             T("rMsgTotal","Wallet subtotal"));
+
+    // Discounts are applied for display only; every line above stays at list price.
+    var gBase = {};
+    pick.subLines.concat(pick.msgLines).forEach(function(l){
+      var g = l.grp || "plan";
+      gBase[g] = (gBase[g] || 0) + conv(l.amount, poolCcy(l.ccy), state.outCcy);
+    });
+    var discAmt = 0, offRows = [];
+    void DISC_MSG;
+    DISC_GROUPS.forEach(function(G){
+      var base = gBase[G.k] || 0, pct = discPct(G.k);
+      if (base > 0 && pct > 0){
+        discAmt += base * pct / 100;
+        if (state.discOverride[G.k] !== undefined) offRows.push(pct + "% " + T("dg_" + G.k, G.label));
+      }
+    });
+    var netTotal = pick.totalOut - discAmt;
+    (DISC_ROWS || []).forEach(function(r){
+      var base = gBase[r.G.k] || 0;
+      r.row.hidden = !(base > 0);
+      setDirect(r.lab, T("dg_" + r.G.k, r.G.label));
+      r.amt.textContent = fmtOut(base);
+      if (!r.G.fixed) r.inp.placeholder = String(state.discount);
+    });
+    var dOut = $("discOut");
+    if (discAmt > 0){
+      var eff = pick.totalOut > 0 ? Math.round(discAmt / pick.totalOut * 1000) / 10 : 0;
+      dOut.hidden = false;
+      dOut.innerHTML = "<b>" + T("discOff","You give away") + " " + fmtOut(discAmt) + "</b> " +
+        T("discPerMonth","a month") + " \u00b7 " + eff + "% " + T("discEff","of the bill") +
+        (offRows.length ? "<br>" + offRows.join(" \u00b7 ") : "") +
+        "<br><span class=\"was\">" + fmtOut(pick.totalOut) + "</span> \u2192 <b>" +
+        fmtOut(netTotal) + "</b> " + T("discNet","after discount") +
+        "<br>" + fmtOut(discAmt * 12) + " " + T("discYear","given away over a year");
+    } else {
+      dOut.hidden = true; dOut.innerHTML = "";
+    }
+
+    var g = $("grand");
+    g.textContent = fmtOut(netTotal);
+    // Show what Wati actually bills alongside the quoted currency.
+    var ga = $("grandAlt");
+    if (state.outCcy !== CONFIG.planCcy){
+      var billed = conv(netTotal, state.outCcy, CONFIG.planCcy);
+      ga.hidden = false;
+      ga.textContent = "= " + fmtIn(billed, CONFIG.planCcy) + " " +
+        T("billedIn","billed in") + " " + CONFIG.planCcy;
+    } else {
+      ga.hidden = true; ga.textContent = "";
+    }
+    $("cycleLabel").textContent = F("cycShown", "{0} \u00b7 shown in {1}", cycleSub(), state.outCcy);
+    if (lastGrand !== null && Math.round(netTotal) !== lastGrand){
+      g.classList.remove("pulse"); void g.offsetWidth; g.classList.add("pulse");
+    }
+    lastGrand = Math.round(netTotal);
+    $("mbPlan").textContent = "Wati " + pick.plan.label;
+    $("mbTotal").textContent = fmtOut(netTotal);
+
+    var mk = conv(pick.volumes.marketing * rateFor(pick.key,"marketing",state.country), CONFIG.rateCcy, state.outCcy);
+    var ut = conv(pick.volumes.utility * rateFor(pick.key,"utility",state.country) +
+                  pick.volumes.authentication * rateFor(pick.key,"authentication",state.country) +
+                  pick.volumes.service * serviceRate(pick.key,state.country), CONFIG.rateCcy, state.outCcy);
+    var addons = pick.subOut - pick.platformOut - pick.seatOut;
+    var parts = [
+      { v:pick.platformOut, label:"Plan", color:"var(--black)" },
+      { v:mk,               label:"Marketing", color:"var(--blue)" },
+      { v:ut,               label:"Utility, OTP & service", color:"var(--green)" },
+      { v:pick.seatOut + Math.max(0,addons), label:"Users & add-ons", color:"var(--yellow)" }
+    ];
+    var sum = parts.reduce(function(s,p){ return s + (isNaN(p.v)?0:p.v); },0) || 1;
+    var bars = $("comp").children;
+    parts.forEach(function(p,i){
+      var w = isNaN(p.v) ? 0 : p.v/sum*100;
+      bars[i].style.width = w + "%";
+      bars[i].style.background = p.color;
+    });
+    $("clegend").innerHTML = parts.filter(function(p){ return p.v > 0; }).map(function(p){
+      return '<span><i style="background:'+p.color+'"></i>'+p.label+' <b>'+Math.round(p.v/sum*100)+'%</b></span>';
+    }).join("");
+
+    // Volume mix, in messages rather than money: the split an AE talks through.
+    (function(){
+      var v = pick.volumes;
+      var seg = [
+        { n: v.marketing,      label: T("t018","Marketing"),      color:"var(--blue)" },
+        { n: v.utility,        label: T("t020","Utility"),        color:"var(--green)" },
+        { n: v.authentication, label: T("t022","Authentication"), color:"var(--pink)" },
+        { n: v.service,        label: T("mixSvc","Service"),      color:"var(--yellow)" }
+      ];
+      var tot = seg.reduce(function(a,b){ return a + b.n; }, 0);
+      var bars = $("mixbar").children;
+      seg.forEach(function(p, i){
+        bars[i].style.width = (tot ? p.n / tot * 100 : 0) + "%";
+        bars[i].style.background = p.color;
+      });
+      $("mixTotal").textContent = count(tot) + " " + T("mixMsgs","messages a month");
+      $("mixlegend").innerHTML = seg.filter(function(p){ return p.n > 0; }).map(function(p){
+        return '<span><i style="background:' + p.color + '"></i>' + p.label +
+               ' <b>' + Math.round(p.n / tot * 100) + '%</b></span>';
+      }).join("") || '<span class="mix-free">' +
+        T("mixNone","Add your monthly volumes above and the mix appears here.") + '</span>';
+    })();
+
+    var totalMsgs = pick.volumes.total;
+    $("blended").textContent = totalMsgs
+      ? (function(){
+          var v = pick.totalOut/totalMsgs;
+          if (isNaN(v)) return "—";
+          try { return new Intl.NumberFormat(undefined,{style:"currency",currency:state.outCcy,
+            minimumFractionDigits:4,maximumFractionDigits:4}).format(v); }
+          catch(e){ return state.outCcy + " " + v.toFixed(4); }
+        })()
+      : "—";
+    $("yearly").textContent = fmtOut(pick.totalOut * 12);
+
+    renderPlans(all, pick);
+    renderFx();
+    window.__pick = pick;
+  }
+
+  function addGroup(box, title, lines, subtotalOut, subtotalLabel){
+    if (!lines.length) return;
+    var h = document.createElement("div");
+    h.className = "ghead"; h.textContent = title;
+    box.appendChild(h);
+    lines.forEach(function(l){
+      var row = document.createElement("div");
+      row.className = "line" + (l.extra ? " extra" : "") + (l.free ? " free" : "");
+      var n = document.createElement("span");
+      n.className = "l-name";
+      n.appendChild(document.createTextNode(l.name));
+      if (l.sub){
+        var s = document.createElement("span");
+        s.className = "l-sub"; s.textContent = l.sub;
+        n.appendChild(s);
+      }
+      var a = document.createElement("span");
+      a.className = "l-amt";
+      a.textContent = l.free ? "Free" : fmtOut(conv(l.amount, poolCcy(l.ccy), state.outCcy));
+      row.appendChild(n); row.appendChild(a);
+      box.appendChild(row);
+    });
+    var st = document.createElement("div");
+    st.className = "stot";
+    st.innerHTML = "<span>" + subtotalLabel + '</span><span class="v">' + fmtOut(subtotalOut) + "</span>";
+    box.appendChild(st);
+  }
+
+  // Quoting a tier above what the inputs require is a normal sales move, so the
+  // override always honours the choice. It only warns when the pinned plan
+  // physically cannot do the job, because then the total understates the truth.
+  function pinnedVerdict(pick, best){
+    var bits = [F("vPinned", "You\u2019ve pinned <b>{0}</b>.", pick.plan.label)];
+    if (best.key === pick.key){
+      bits.push(T("vPinnedBest", "That\u2019s also the cheapest plan that fits."));
+    } else {
+      var diff = pick.totalOut - best.totalOut;
+      bits.push(F(diff >= 0 ? "vPinnedMore" : "vPinnedLess",
+        diff >= 0 ? "Cheapest that fits is <b>{0}</b> at {1}, so this is {2} more a month."
+                  : "Cheapest that fits is <b>{0}</b> at {1}, so this is {2} less a month.",
+        best.plan.label, fmtOut(best.totalOut), fmtOut(Math.abs(diff))));
+    }
+    return bits.join(" ");
+  }
+
+  function renderPinned(pick, best){
+    var el = $("pinned");
+    if (state.planPick === "auto" || pick.eligible){ el.hidden = true; return; }
+    var lines = pick.reasons.slice();
+    // Costs this plan cannot carry are silently absent from the bill — say so.
+    var missing = [];
+    if (state.agents > pick.plan.seats && pick.plan.extraSeat === null){
+      missing.push((state.agents - pick.plan.seats) + " extra " +
+        (state.agents - pick.plan.seats === 1 ? "user is" : "users are") + " not priced in");
+    }
+    if (state.numbers > 1 && pick.plan.numbers !== null){
+      missing.push((state.numbers - 1) + " extra WhatsApp " +
+        (state.numbers - 1 === 1 ? "number is" : "numbers are") + " not priced in");
+    }
+    el.hidden = false;
+    el.innerHTML = "<b>Heads up \u2014 " + pick.plan.label + " can't cover these requirements.</b> " +
+      lines.join(" ") + (missing.length ? " The total below excludes them: " + missing.join(", ") + "." : "");
+  }
+
+  function verdictText(pick, all){
+    if (!pick.eligible){
+      return T("vNone", "None of the standard plans covers this, so it needs a custom quote. Closest fit shown.");
+    }
+    var bits = [F("vCheapest", "<b>{0}</b> is the cheapest plan that meets your requirements.", pick.plan.label)];
+    var blocked = PLAN_ORDER.map(function(k){ return all[k]; }).filter(function(e){ return !e.eligible; });
+    if (blocked.length === 1){
+      var r = blocked[0].reasons[0];
+      bits.push(F("vOut1", "{0} is out: {1}", blocked[0].plan.label,
+        r.charAt(0).toLowerCase() + r.slice(1)));
+    } else if (blocked.length > 1){
+      // Name the reason, not just the plan: an AE needs to know which input to change.
+      var why = {};
+      blocked.forEach(function(e){ e.reasons.forEach(function(r){ why[r] = 1; }); });
+      var list = Object.keys(why).slice(0, 2).map(function(r){
+        return r.charAt(0).toLowerCase() + r.slice(1).replace(/\.$/, "");
+      });
+      bits.push(F("vOutMany", "{0} are out{1}.",
+        blocked.map(function(b){ return b.plan.label; }).join(" " + T("and","and") + " "),
+        list.length ? ": " + list.join("; ") : ""));
+    }
+    if (CONFIG.payg && state.agents === 1 && state.numbers === 1 &&
+        !state.needShopify &&
+        pick.volumes.total * 3 <= CONFIG.payg.messages){
+      bits.push(F("vPayg", "At this volume the {0} may work out cheaper than any subscription \u2014 worth a look.",
+        CONFIG.payg.label));
+    }
+    // A bigger plan can be the cheaper bill: its per-message rates are lower.
+    (function(){
+      var cheaperTier = PLAN_ORDER.filter(function(k){
+        return all[k].eligible && PLAN_ORDER.indexOf(k) < PLAN_ORDER.indexOf(pick.key);
+      });
+      if (!cheaperTier.length) return;
+      var next = all[cheaperTier[cheaperTier.length - 1]];
+      var gap = next.totalOut - pick.totalOut;
+      if (gap > 0){
+        bits.push(F("vTierUp",
+          "{0} also qualifies but costs {1} a month more: its per-message rates are higher, and at this volume that outweighs the lower plan fee.",
+          next.plan.label, fmtOut(gap)));
+      }
+    })();
+    if (pick.msgOut > pick.subOut && pick.totalOut > 0){
+      bits.push(F("vMsgShare", "Messages are {0}% of the cost \u2014 the subscription is the small part.",
+        Math.round(pick.msgOut/pick.totalOut*100)));
+    }
+    return bits.join(" ");
+  }
+
+  // Plan contents from the public comparison table. Product limits, identical in
+  // every region — nothing here comes from a rate card.
+  var PLAN_SPEC = {
+    growth: ["pg1", "pg2", "pg3", "pg4", "pg5"],
+    pro: ["pp1", "pp2", "pp3", "pp4", "pp5"],
+    business: ["pb1", "pb2", "pb3", "pb4", "pb5", "pb6"]
+  };
+  var PLAN_SPEC_EN = {
+    pg1: "2 chatbots, 30 keyword rules",
+    pg2: "20 messages a second on broadcasts",
+    pg3: "10K API calls a month, 30 every 10 seconds",
+    pg4: "No webhooks, no forms",
+    pg5: "2 integrations \u00b7 email support 24/5",
+    pp1: "Unlimited chatbots and keyword rules",
+    pp2: "40 messages a second on broadcasts",
+    pp3: "200K API calls a month, 60 every 10 seconds",
+    pp4: "2 webhooks \u00b7 2 forms",
+    pp5: "5 integrations \u00b7 email 24/7 and chat support",
+    pb1: "Unlimited chatbots and keyword rules",
+    pb2: "80 messages a second on broadcasts",
+    pb3: "20M API calls a month, 100 every 10 seconds",
+    pb4: "4 webhooks \u00b7 10 forms",
+    pb5: "Unlimited integrations \u00b7 priority support and a dedicated CSM",
+    pb6: "Round-robin, number masking and operator chat visibility built in"
+  };
+
+  // The support articles behind the service levels, opened live on a call.
+  var PLAN_LINKS = {
+    pg5: [{ url: "https://support.wati.io/en/articles/11462988-understanding-support-for-growth-plan-basic",
+            k: "slaLink", en: "Support SLA" }],
+    pp5: [{ url: "https://support.wati.io/en/articles/11462989-understanding-support-for-pro-plan-standard",
+            k: "slaLink", en: "Support SLA" }],
+    pb5: [{ url: "https://support.wati.io/en/articles/11462990-understanding-support-for-business-plans-premium",
+            k: "slaLink", en: "Support SLA" },
+          { url: "https://support.wati.io/en/articles/15054074-understanding-the-role-of-your-dedicated-customer-success-manager-csm",
+            k: "csmLink", en: "What a CSM does" }]
+  };
+
+  // Seat counts differ by region (Business carries 10 in LATAM, 5 elsewhere) and
+  // mainland China does not sell Growth, so this sentence is built, never fixed.
+  // The ladder shows every plan's contact capacity at once: solid bar for what
+  // the plan includes, ghosted for what add-on packs can reach, and a marker at
+  // what the customer actually needs.
+  function renderMac(){
+    if (!CONFIG.mac) return;
+    var M = CONFIG.mac, box = $("macBox");
+    var top = Math.max(M.ceil.business, state.macs);
+    box.innerHTML = "";
+    PLAN_ORDER.forEach(function(k){
+      var base = M.base[k], ceil = M.ceil[k], fits = state.macs <= ceil;
+      var row = document.createElement("div");
+      row.className = "macrow " + (fits ? "fits" : "out");
+      var mp = document.createElement("span");
+      mp.className = "mp"; mp.textContent = CONFIG.plans[k].label;
+      var mt = document.createElement("span"); mt.className = "mt";
+      var ghost = document.createElement("i"); ghost.style.width = (ceil / top * 100) + "%";
+      var solid = document.createElement("b"); solid.style.width = (base / top * 100) + "%";
+      var mark = document.createElement("span");
+      mark.className = "macmark";
+      mark.style.left = Math.min(100, state.macs / top * 100) + "%";
+      mt.appendChild(ghost); mt.appendChild(solid); mt.appendChild(mark);
+      var mn = document.createElement("span");
+      mn.className = "mn";
+      mn.textContent = (ceil > base)
+        ? count(base) + " \u2192 " + count(ceil)
+        : count(base);
+      row.appendChild(mp); row.appendChild(mt); row.appendChild(mn);
+      box.appendChild(row);
+    });
+    var fitting = PLAN_ORDER.filter(function(k){ return state.macs <= M.ceil[k]; });
+    $("macHint").textContent = fitting.length
+      ? F("macFits", "{0} fits on {1}.", count(state.macs),
+          fitting.map(function(k){ return CONFIG.plans[k].label; }).join(", "))
+      : F("macNone", "{0} is past every published plan. Enterprise is sized by your CSM.",
+          count(state.macs));
+  }
+
+  function seatHint(){
+    var P = CONFIG.plans, hid = CONFIG.hidePlans || [];
+    var g = P.growth.seats, p = P.pro.seats, b = P.business.seats;
+    if (hid.indexOf("growth") !== -1)
+      return (p === b)
+        ? F("hintSeatsNoGrowthSame", "Pro and Business both include {0}.", p)
+        : F("hintSeatsNoGrowth", "Pro includes {0}, Business {1}.", p, b);
+    if (state.agents > g)
+      return (p === b)
+        ? F("hintSeatsOver", "{0} users rules out Growth, which is capped at {1}.",
+            state.agents, g)
+        : F("hintSeatsOverSplit",
+            "{0} users rules out Growth, capped at {1}. Business includes {2}.",
+            state.agents, g, b);
+    return (p === b)
+      ? F("hintSeatsOk", "Growth covers up to {0}. Pro and Business include {1}.", g, p)
+      : F("hintSeatsSplit", "Growth covers up to {0}. Pro includes {1}, Business {2}.",
+          g, p, b);
+  }
+
+  function renderPlans(all, pick){
+    var wrap = $("plans");
+    wrap.innerHTML = "";
+    PLAN_ORDER.forEach(function(k){
+      var e = all[k];
+      var card = document.createElement("div");
+      card.className = "plan " + k + (e.key === pick.key ? " best" : "") + (e.eligible ? "" : " out");
+
+      var top = document.createElement("div");
+      top.className = "p-top";
+      var h = document.createElement("h3"); h.textContent = e.plan.label;
+      top.appendChild(h);
+      if (state.planPick !== "auto" && e.key === state.planPick){
+        var pin = document.createElement("span"); pin.className = "tag"; pin.textContent = T("tagQuoting","Quoting"); top.appendChild(pin);
+      } else if (e.key === pick.key && e.eligible){
+        var t = document.createElement("span"); t.className = "tag"; t.textContent = T("t049","Best fit"); top.appendChild(t);
+      } else if (!e.eligible){
+        var no = document.createElement("span"); no.className = "tag no"; no.textContent = T("tagNoFit","Doesn\u2019t fit"); top.appendChild(no);
+      }
+      card.appendChild(top);
+
+      var tot = document.createElement("div");
+      tot.className = "p-tot num";
+      tot.innerHTML = fmtOut(e.totalOut) + "<small>" + T("pAllIn","per month, all in") + "</small>";
+      card.appendChild(tot);
+
+      var facts = document.createElement("ul");
+      facts.className = "p-facts";
+      [
+        F("pPlan", "Plan {0}", fmtOut(e.platformOut)),
+        e.extraSeats > 0 && e.plan.extraSeat !== null
+          ? F("pExtraSeats", "{0} extra users {1}", e.extraSeats, fmtOut(e.seatOut))
+          : (e.plan.extraSeat === null
+              ? F("pSeatsFixed", "{0} users included, no extras possible", e.plan.seats)
+              : F("pSeatsInc", "{0} users included", e.plan.seats)),
+        F("pMsgs", "Messages {0}, marketing at {1}", fmtOut(e.msgOut), msgRate(e.marketingRate)),
+        e.trigBand.price > 0
+          ? F("pTrigTop", "Trigger top-up {0} ({1} band)", money(e.trigBand.price), count(e.trigBand.size))
+          : F("pTrigOk", "{0} triggers, enough for you", count(e.plan.triggers))
+      ].forEach(function(r){
+        var li = document.createElement("li"); li.textContent = r; facts.appendChild(li);
+      });
+      card.appendChild(facts);
+
+      // What the plan carries before anyone adds a thing to it.
+      var ih = document.createElement("p");
+      ih.className = "p-ih"; ih.textContent = T("pIncluded", "Included with the plan");
+      card.appendChild(ih);
+      var incl = document.createElement("ul");
+      incl.className = "p-facts p-incl";
+      (PLAN_SPEC[k] || []).forEach(function(key){
+        var li = document.createElement("li");
+        var sp = document.createElement("span");
+        sp.appendChild(document.createTextNode(T(key, PLAN_SPEC_EN[key])));
+        (PLAN_LINKS[key] || []).forEach(function(l){
+          var a = document.createElement("a");
+          a.className = "ao-link"; a.href = l.url;
+          a.target = "_blank"; a.rel = "noopener";
+          a.textContent = T(l.k, l.en);
+          sp.appendChild(document.createTextNode(" "));
+          sp.appendChild(a);
+        });
+        li.appendChild(sp);
+        incl.appendChild(li);
+      });
+      card.appendChild(incl);
+
+      if (!e.eligible){
+        e.reasons.forEach(function(r){
+          var p = document.createElement("p"); p.className = "p-why"; p.textContent = r; card.appendChild(p);
+        });
+      }
+      wrap.appendChild(card);
+    });
+  }
+
+  /* ============================================================
+     Wiring
+     ============================================================ */
+  function pair(rangeId, numId, key, opts){
+    opts = opts || {};
+    var r = $(rangeId), n = $(numId);
+    function set(v, from){
+      v = Math.max(0, isFinite(v) ? v : 0);
+      if (opts.min !== undefined) v = Math.max(opts.min, v);
+      if (opts.max !== undefined) v = Math.min(opts.max, v);
+      state[key] = v;
+      if (from !== "range") r.value = Math.min(v, Number(r.max));
+      if (from !== "num") n.value = v;
+      render();
+    }
+    r.addEventListener("input", function(){ set(Number(r.value), "range"); });
+    n.addEventListener("input", function(){ set(Number(n.value), "num"); });
+    return function(v){ set(v); };
+  }
+
+  pair("numbersRange","numbersNum","numbers",{min:1});
+  var setAgents = pair("agentsRange","agentsNum","agents",{min:1});
+  var setMac    = pair("macRange","macNum","macs");
+  // Outside the MAC regions the question does not exist, and the numbers on the
+  // remaining questions close up behind it.
+  if (!CONFIG.mac) $("qMac").hidden = true;
+  (function renumber(){
+    var n = 0;
+    Array.prototype.forEach.call(document.querySelectorAll("section.q"), function(sec){
+      if (sec.hidden) return;
+      var el = sec.querySelector(".q-num");
+      if (el) el.textContent = String(++n);
+    });
+  })();
+
+  var setMkt    = pair("mktRange","mktNum","mkt");
+  var setUtil   = pair("utilRange","utilNum","util");
+  var setAuth   = pair("authRange","authNum","auth");
+  var setSvc   = pair("svcRange","svcNum","service");
+  var setTrig   = pair("trigRange","trigNum","triggers");
+  var setAi    = pair("aiRange","aiNum","aiCredits");
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-usecase]"), function(btn){
+    btn.addEventListener("click", function(){
+      Array.prototype.forEach.call(document.querySelectorAll("[data-usecase]"), function(b){
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      state.useCase = btn.dataset.usecase;
+      var p = PRESETS[state.useCase];
+      setMkt(p.mkt); setUtil(p.util); setAuth(p.auth); setSvc(p.svc); setAgents(p.agents); setTrig(p.trig); setAi(p.ai);
+      if (CONFIG.mac) setMac(p.mac);
+      render();
+    });
+  });
+
+  Array.prototype.forEach.call($("planPick").children, function(b){
+    if (b.dataset.plan !== "auto" && PLAN_ORDER.indexOf(b.dataset.plan) === -1){
+      b.hidden = true; return;
+    }
+    b.addEventListener("click", function(){ state.planPick = b.dataset.plan; render(); });
+  });
+
+  (function(){
+    var n = $("aiAgentNum");
+    n.addEventListener("input", function(){
+      state.aiAgents = Math.max(0, Number(n.value) || 0); render();
+    });
+  })();
+  $("needVoice").addEventListener("change", function(){ state.needVoice = this.checked; render(); });
+
+  // The controls live beside the quote on a wide screen and in the top bar on a
+  // narrow one, where there is no second column to sit above.
+  (function(){
+    var bar = $("ctrlBar"), slot = $("ctrlSlot"), top = $("barRight");
+    var wide = window.matchMedia("(min-width: 981px)");
+    function place(){
+      var host = wide.matches ? slot : top;
+      if (bar.parentNode !== host) host.appendChild(bar);
+    }
+    place();
+    if (wide.addEventListener) wide.addEventListener("change", place);
+    else if (wide.addListener) wide.addListener(place);
+  })();
+
+  // Details: off is the working view for a live call; on is the full explanation.
+  (function(){
+    var btn = $("detailBtn"), root = document.documentElement;
+    function set(on, save){
+      root.setAttribute("data-detail", on ? "on" : "off");
+      btn.setAttribute("aria-checked", String(on));
+      if (save){ try { localStorage.setItem("wati-detail", on ? "on" : "off"); } catch(e){} }
+    }
+    set(root.getAttribute("data-detail") === "on", false);
+    btn.addEventListener("click", function(){
+      set(root.getAttribute("data-detail") !== "on", true);
+    });
+  })();
+
+  (function(){
+    var btn = $("themeBtn"), root = document.documentElement;
+    function sync(){
+      var dark = root.getAttribute("data-theme") === "dark";
+      btn.setAttribute("aria-checked", String(dark));
+      btn.title = dark ? "Switch to light mode" : "Switch to dark mode";
+    }
+    sync();
+    btn.addEventListener("click", function(){
+      var dark = root.getAttribute("data-theme") === "dark";
+      root.setAttribute("data-theme", dark ? "light" : "dark");
+      try { localStorage.setItem("wati-theme", dark ? "light" : "dark"); } catch(e){}
+      sync();
+    });
+  })();
+
+  // A changed total gets a short pulse, so an edit two metres away still reads.
+  (function(){
+    var el = $("grand"), last = null, t = null;
+    new MutationObserver(function(){
+      var v = el.textContent;
+      if (last !== null && v !== last){
+        el.classList.remove("bump");
+        void el.offsetWidth;
+        el.classList.add("bump");
+        clearTimeout(t); t = setTimeout(function(){ el.classList.remove("bump"); }, 420);
+      }
+      last = v;
+    }).observe(el, { childList:true, characterData:true, subtree:true });
+  })();
+
+  // Questions ease in as they come into view; static if the viewer prefers that.
+  (function(){
+    if (!window.IntersectionObserver) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    Array.prototype.forEach.call(document.querySelectorAll("form .q, .channels"), function(el, i){
+      if (i < 2){ return; }           // the first screenful is there on arrival
+      el.classList.add("reveal"); io.observe(el);
+    });
+  })();
+
+  var DISC_ROWS = [];
+  (function(){
+    var d = $("discNum");
+    d.addEventListener("input", function(){
+      state.discount = Math.max(0, Math.min(100, Number(d.value) || 0)); render();
+    });
+
+    var rows = $("discRows");
+
+    DISC_GROUPS.forEach(function(G){
+      var row = document.createElement("div"); row.className = "drow";
+      var lab = document.createElement("span"); lab.className = "dlab";
+      var amt = document.createElement("span"); amt.className = "damt";
+      var inp = document.createElement("input");
+      inp.className = "num"; inp.type = "number"; inp.min = "0"; inp.max = "100"; inp.step = "1";
+      inp.id = "disc_" + G.k;
+      inp.setAttribute("aria-label", G.label + " discount percent");
+      var pc = document.createElement("span"); pc.className = "dpc"; pc.textContent = "%";
+      if (G.fixed){
+        row.className = "drow fixed";
+        inp.value = "0"; inp.disabled = true;
+      } else {
+        inp.addEventListener("input", function(){
+          var v = inp.value.trim();
+          if (v === "") delete state.discOverride[G.k];
+          else state.discOverride[G.k] = Math.max(0, Math.min(100, Number(v) || 0));
+          render();
+        });
+      }
+      row.appendChild(lab); row.appendChild(amt); row.appendChild(inp); row.appendChild(pc);
+      rows.appendChild(row);
+      DISC_ROWS.push({ G:G, row:row, lab:lab, amt:amt, inp:inp });
+    });
+  })();
+
+  // Add-ons are built from the region's rate card, grouped per-user then monthly.
+  var ADDON_LABELS = [];
+  function renderAddonPrices(planKey){
+    (ADDON_LABELS || []).forEach(function(r){
+      var free = addonFree(r.a, planKey);
+      // setDirect, not textContent: the per-user label has the hint nested inside it.
+      setDirect(r.el, T("ao_" + r.a.k, r.a.label) + " \u2014 " + (free
+        ? F("aoInPlan", "included in {0}", CONFIG.plans[planKey].label)
+        : money(r.a.p, r.a.ccy) + " " +
+          (r.a.unit === "user" ? T("perUser","a user")
+            : r.a.unit === "agent" ? T("perAgent","an agent") : T("perMonth","a month"))));
+      if (r.el.parentElement) r.el.parentElement.classList.toggle("ao-incl", free);
+      if (r.hint) r.hint.firstChild.nodeValue = T("ao_" + r.a.k + "_h", r.a.hint) + " ";
+      if (r.link) r.link.textContent = T("aoLearn","What this does");
+      if (r.note) r.note.textContent = addonNote(r.a, planKey);
+    });
+  }
+  // Live "8 users -> 10 billed" line under each per-user add-on.
+  function addonNote(a, planKey){
+    var v = state.addons[a.k];
+    if (!v) return "";
+    if (addonFree(a, planKey)){
+      return F("aoNoCharge", "No charge \u2014 {0} already includes it.",
+        CONFIG.plans[planKey].label);
+    }
+    if (a.unit === "agent"){
+      return count(v) + " \u00d7 " + money(a.p, a.ccy) + " = " +
+        money(a.p * v, a.ccy) + " " + T("perMonth","a month");
+    }
+    var seats = addonSeats(v);
+    return count(v) + " " + T("rUsers","users") + " \u2192 " + count(seats) + " " +
+      packWord() + " = " + money(a.p * seats, a.ccy) + " " +
+      T("perMonth","a month");
+  }
+  function rebuildAddons(){
+    var host = $("addonList");
+    if (!host || !CONFIG.addons) return;
+    host.innerHTML = ""; ADDON_LABELS = [];
+    [["user", ADDON_PACK === 10 ? T("grpUser10","Per user, sold in packs of ten")
+                                 : T("grpUser","Per user, sold in packs of five")],
+     ["agent", T("grpAgent","Per AI agent")],
+     ["month", T("grpMonth","Monthly, flat fee")]].forEach(function(g){
+      var items = CONFIG.addons.filter(function(a){ return a.unit === g[0]; });
+      if (!items.length) return;
+      var h = document.createElement("p");
+      h.className = "s-head"; h.textContent = g[1]; host.appendChild(h);
+      var grid = document.createElement("div"); grid.className = "ao-grid";
+      host.appendChild(grid);
+      items.forEach(function(a){
+        var hint = document.createElement("span");
+        hint.className = "hint ex";
+        hint.appendChild(document.createTextNode(T("ao_" + a.k + "_h", a.hint)));
+        var link = null;
+        if (a.url){
+          link = document.createElement("a");
+          link.className = "ao-link";
+          link.href = a.url; link.target = "_blank"; link.rel = "noopener";
+          link.textContent = T("aoLearn","What this does");
+        }
+        var lab, rec = { a:a, hint:hint, link:link };
+
+        if (a.unit === "user" || a.unit === "agent"){
+          // Quantity, not a tick: the AE types how many operators need it.
+          var field = document.createElement("div"); field.className = "field";
+          var top = document.createElement("div"); top.className = "field-top";
+          lab = document.createElement("label");
+          lab.className = "field-label stack";
+          lab.setAttribute("for", "ad_" + a.k);
+          lab.appendChild(document.createTextNode(""));
+          if (link) lab.appendChild(link);
+          lab.appendChild(hint);
+          var num = document.createElement("input");
+          num.className = "num"; num.type = "number"; num.id = "ad_" + a.k;
+          num.min = "0"; num.max = "1000"; num.step = "1";
+          num.value = String(state.addons[a.k] || 0);
+          top.appendChild(lab); top.appendChild(num);
+          var note = document.createElement("span");
+          note.className = "hint"; note.style.marginTop = "7px";
+          field.appendChild(top); field.appendChild(note);
+          num.addEventListener("input", function(){
+            state.addons[a.k] = Math.max(0, Number(num.value) || 0); render();
+          });
+          rec.el = lab; rec.note = note;
+          ADDON_LABELS.push(rec);
+          grid.appendChild(field);
+        } else {
+          var row = document.createElement("div"); row.className = "check";
+          var cb = document.createElement("input");
+          cb.type = "checkbox"; cb.id = "ad_" + a.k;
+          cb.checked = !!state.addons[a.k];
+          var box = document.createElement("div");
+          lab = document.createElement("label");
+          lab.setAttribute("for", cb.id);
+          box.appendChild(lab);
+          if (link) box.appendChild(link);
+          box.appendChild(hint);
+          row.appendChild(cb); row.appendChild(box);
+          cb.addEventListener("change", function(){ state.addons[a.k] = cb.checked ? 1 : 0; render(); });
+          rec.el = lab;
+          ADDON_LABELS.push(rec);
+          grid.appendChild(row);
+        }
+      });
+    });
+  }
+  rebuildAddons();
+
+  // Language switcher — only shown when this region ships more than English.
+  (function(){
+    var sel = $("langPick"), keys = Object.keys(LANGS);
+    if (!keys.length) return;
+    captureEnglish();
+    ["en"].concat(keys).forEach(function(code){
+      var o = document.createElement("option");
+      o.value = code; o.textContent = LANG_NAMES[code] || code;
+      sel.appendChild(o);
+    });
+    $("langBox").hidden = false;
+    sel.value = "en";
+    sel.addEventListener("change", function(){ LANG = sel.value; applyLang(); });
+  })();
+
+  $("needShopify").addEventListener("change", function(){ state.needShopify = this.checked; render(); });
+
+  // Billing cycles vary by region: two in most, three in India.
+  (function(){
+    var bar = $("cycleBar");
+    CONFIG.cycles.forEach(function(c){
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = T("cyc_" + c.key, c.label);
+      b.setAttribute("aria-pressed", String(c.key === state.cycle));
+      b.addEventListener("click", function(){ setCycle(c.key); });
+      bar.appendChild(b);
+    });
+    LANG_HOOKS.push(function(){
+      Array.prototype.forEach.call(bar.children, function(b, i){
+        b.textContent = T("cyc_" + CONFIG.cycles[i].key, CONFIG.cycles[i].label);
+      });
+    });
+  })();
+  function setCycle(k){
+    state.cycle = k;
+    Array.prototype.forEach.call($("cycleBar").children, function(b, i){
+      b.setAttribute("aria-pressed", String(CONFIG.cycles[i].key === k));
+    });
+    render();
+  }
+  function cycleSub(){
+    for (var i = 0; i < CONFIG.cycles.length; i++){
+      if (CONFIG.cycles[i].key === state.cycle)
+        return T("cycSub_" + state.cycle, CONFIG.cycles[i].sub);
+    }
+    return "";
+  }
+
+  // recipient country — every country on the rate card
+  (function(){
+    var sel = $("country");
+    // The region's own markets sit at the top; every other country on the card
+    // follows, so an AE can still price a message to anywhere.
+    var home = (CONFIG.homeIsos || []).filter(function(i){ return RATES[i]; });
+    var inHome = {}; home.forEach(function(i){ inHome[i] = true; });
+    function opt(iso){
+      var o = document.createElement("option");
+      o.value = iso; o.textContent = NAMES[iso] || iso;
+      return o;
+    }
+    if (home.length && home.length < Object.keys(RATES).length){
+      var g1 = document.createElement("optgroup");
+      g1.label = CONFIG.region;
+      g1.setAttribute("data-i18n-group", "home");
+      home.forEach(function(i){ g1.appendChild(opt(i)); });
+      sel.appendChild(g1);
+      var g2 = document.createElement("optgroup");
+      g2.label = "Everywhere else";
+      g2.setAttribute("data-i18n-group", "rest");
+      Object.keys(RATES).forEach(function(iso){ if (!inHome[iso]) g2.appendChild(opt(iso)); });
+      sel.appendChild(g2);
+    } else {
+      Object.keys(RATES).forEach(function(iso){ sel.appendChild(opt(iso)); });
+    }
+    sel.value = state.country;
+    sel.addEventListener("change", function(){ state.country = this.value; render(); });
+  })();
+
+  // Rate cards for this region, so an AE can open the source document on a call.
+  (function(){
+    var rc = CONFIG.rateCards;
+    if (!rc || !rc.items || !rc.items.length) return;
+    var box = $("rateCards");
+    var h = document.createElement("h4");
+    h.textContent = T("rcHead","The rate cards behind these numbers");
+    h.setAttribute("data-i18n", "rcHead");
+    box.appendChild(h);
+    var ul = document.createElement("ul");
+    rc.items.forEach(function(it){
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = it.url || rc.folder;
+      a.target = "_blank"; a.rel = "noopener";
+      a.appendChild(document.createTextNode(it.label + " "));
+      var s = document.createElement("span");
+      s.className = "rc-file"; s.textContent = it.card;
+      a.appendChild(s);
+      li.appendChild(a); ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    var p = document.createElement("p");
+    var anyFolder = rc.items.some(function(i){ return !i.url || i.url.indexOf("/folders/") > -1; });
+    function fillEff(){
+      p.textContent = F("rcEffective", "Effective {0}.", T("rcDate", rc.effective)) +
+        (anyFolder ? " " + T("rcFolder", "Where a link opens a folder, pick the file named on the button.") : "");
+    }
+    fillEff();
+    p.setAttribute("data-i18n-skip", "1");
+    LANG_HOOKS.push(fillEff);
+    box.appendChild(p);
+  })();
+
+  // output currency — the region's countries, plus the billing currency
+  function rebuildCcyOptions(){
+    var sel = $("outCcy");
+    var keep = state.outCcy;
+    sel.innerHTML = "";
+    var seen = {};
+    function add(text, ccy, group){
+      if (seen[ccy + "|" + text]) return;
+      seen[ccy + "|" + text] = 1;
+      var o = document.createElement("option");
+      o.value = ccy;
+      var ok = ccyAvailable(ccy);
+      o.textContent = text + (ok ? "" : "  (rate unavailable)");
+      o.disabled = !ok;
+      (group || sel).appendChild(o);
+    }
+    add(CONFIG.planCcy + " \u00b7 " + T("ccyBilling","billing currency"), CONFIG.planCcy);
+    var g = document.createElement("optgroup");
+    g.label = CONFIG.region + " local currencies";
+    CONFIG.currencies.forEach(function(c){ add(c.country + " — " + c.ccy, c.ccy, g); });
+    sel.appendChild(g);
+    if (!ccyAvailable(keep)) keep = CONFIG.planCcy;
+    sel.value = keep; state.outCcy = keep;
+  }
+  $("outCcy").addEventListener("change", function(){ state.outCcy = this.value; render(); });
+
+  /* ---------------- export ---------------- */
+  $("pdfBtn").addEventListener("click", function(){ window.print(); });
+  // Copy for email. Most of these estimates get pasted into Gmail or Outlook, where
+  // a space-padded ASCII table falls apart, so the clipboard carries a real HTML
+  // table with a plain-text version behind it for anywhere that strips markup.
+  $("copyBtn").addEventListener("click", function(){
+    var p = window.__pick;
+    function amt(l){
+      return l.free ? T("free","Free") : fmtOut(conv(l.amount, poolCcy(l.ccy), state.outCcy));
+    }
+    var doc = { title:"", meta:[], sections:[], notes:[] };
+
+    doc.title = "Wati cost estimate — " + CONFIG.region;
+    doc.meta.push([(state.planPick === "auto" ? "Recommended plan" : "Quoted plan"),
+      p.plan.label + " · " + cycleSub()]);
+    doc.meta.push(["Customers in", NAMES[state.country] || state.country]);
+    doc.meta.push(["Quoted in", state.outCcy + (state.outCcy === CONFIG.planCcy ? "" :
+      " (Wati bills this region in " + CONFIG.planCcy + ")")]);
+    doc.meta.push(["Prepared", new Date().toLocaleDateString()]);
+    if (state.planPick !== "auto" && !p.eligible){
+      doc.notes.push("This plan does not meet every requirement entered — " + p.reasons.join(" "));
+    }
+
+    var req = [
+      ["WhatsApp numbers", count(state.numbers)],
+      ["Team members with access", count(state.agents)],
+      ["Marketing messages a month", count(state.mkt)],
+      ["Utility messages a month", count(state.util)],
+      ["Authentication messages a month", count(state.auth)],
+      ["Service messages a month", count(state.service) +
+        " (first " + count(CONFIG.serviceFree) + " free)"],
+      ["Automation triggers a month", count(state.triggers)]
+    ];
+    if (state.aiCredits) req.push(["Wati AI credits a month", count(state.aiCredits)]);
+    doc.sections.push({ h:"What this is priced on", rows:req });
+
+    function lineRows(lines){
+      return lines.map(function(l){
+        return [l.name + (l.sub ? " — " + l.sub : ""), amt(l)];
+      });
+    }
+    doc.sections.push({ h:"Subscription, billed on your plan cycle",
+      rows: lineRows(p.subLines).concat([["Subscription subtotal", fmtOut(p.subOut), 1]]) });
+    doc.sections.push({ h:"Messages, from your prepaid wallet",
+      rows: lineRows(p.msgLines).concat([["Wallet subtotal", fmtOut(p.msgOut), 1]]) });
+
+    var gb = {};
+    p.subLines.concat(p.msgLines).forEach(function(l){
+      var g = l.grp || "plan";
+      gb[g] = (gb[g] || 0) + conv(l.amount, poolCcy(l.ccy), state.outCcy);
+    });
+    var dAmt = 0, dRows = [];
+    DISC_GROUPS.forEach(function(G){
+      var base = gb[G.k] || 0, pct = discPct(G.k);
+      if (base > 0 && pct > 0){
+        var a = base * pct / 100;
+        dAmt += a;
+        dRows.push([G.label + " — " + pct + "%", "−" + fmtOut(a)]);
+      }
+    });
+    if (dAmt > 0){
+      doc.sections.push({ h:"Discount", rows: dRows.concat([
+        ["List price per month", fmtOut(p.totalOut)],
+        ["Total discount", "−" + fmtOut(dAmt), 1]]) });
+    }
+    doc.total = [dAmt > 0 ? "Total per month after discount" : "Total per month",
+                 fmtOut(p.totalOut - dAmt)];
+    doc.year = [dAmt > 0 ? "Per year after discount" : "Per year",
+                fmtOut((p.totalOut - dAmt) * 12)];
+
+    if (!p.eligible){
+      doc.notes.push("No standard plan meets these requirements — this needs a custom quote.");
+    }
+    doc.notes.push("Inbound customer messages, the first " + count(CONFIG.serviceFree) +
+      " service messages a month and click-to-WhatsApp conversations are free and are not billed above.");
+    doc.notes.push("Message rates come from the Wati usage rate card for " + CONFIG.region +
+      ", effective " + CONFIG.rateCards.effective + ". Rate cards: " + CONFIG.rateCards.folder);
+    if (state.outCcy !== CONFIG.planCcy || CONFIG.rateCcy !== CONFIG.planCcy){
+      doc.notes.push(FX.live
+        ? "Converted at the live rate on " + FX.when.toLocaleString() + " (" + FX.source + ")."
+        : "Live exchange rates were unavailable, so static reference rates were used. Do not quote these figures.");
+    }
+
+    /* ---- plain text: label and value, no column padding ---- */
+    var t = [doc.title, ""];
+    doc.meta.forEach(function(r){ t.push(r[0] + ": " + r[1]); });
+    doc.sections.forEach(function(sec){
+      t.push("", sec.h.toUpperCase());
+      sec.rows.forEach(function(r){ t.push("  " + r[0] + ": " + r[1]); });
+    });
+    t.push("", doc.total[0].toUpperCase() + ": " + doc.total[1], doc.year[0] + ": " + doc.year[1], "");
+    doc.notes.forEach(function(n){ t.push(n); });
+    var text = t.join("\n");
+
+    /* ---- html: one table that survives a paste into Gmail or Outlook ---- */
+    function esc(v){
+      return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+    var F = 'font-family:Arial,Helvetica,sans-serif;';
+    var h = ['<div style="' + F + 'font-size:14px;color:#1d1d1d;line-height:1.5">'];
+    h.push('<p style="margin:0 0 4px;font-size:18px;font-weight:bold">' + esc(doc.title) + '</p>');
+    h.push('<p style="margin:0 0 14px;font-size:13px;color:#555">' +
+      doc.meta.map(function(r){ return esc(r[0]) + ": <b>" + esc(r[1]) + "</b>"; }).join(" &nbsp;&middot;&nbsp; ") +
+      '</p>');
+    h.push('<table cellpadding="0" cellspacing="0" style="' + F +
+      'border-collapse:collapse;font-size:14px;min-width:420px">');
+    doc.sections.forEach(function(sec){
+      h.push('<tr><td colspan="2" style="padding:14px 0 5px;font-size:11px;letter-spacing:.06em;' +
+        'text-transform:uppercase;color:#777;border-bottom:1px solid #e4e9e7">' + esc(sec.h) + '</td></tr>');
+      sec.rows.forEach(function(r){
+        var strong = r[2] ? 'font-weight:bold;' : '';
+        h.push('<tr><td style="padding:6px 24px 6px 0;' + strong + '">' + esc(r[0]) + '</td>' +
+          '<td style="padding:6px 0;text-align:right;white-space:nowrap;' + strong + '">' + esc(r[1]) + '</td></tr>');
+      });
+    });
+    h.push('<tr><td style="padding:14px 24px 4px 0;border-top:2px solid #1d1d1d;font-weight:bold;' +
+      'font-size:16px">' + esc(doc.total[0]) + '</td><td style="padding:14px 0 4px;border-top:2px solid #1d1d1d;' +
+      'text-align:right;font-weight:bold;font-size:16px;white-space:nowrap">' + esc(doc.total[1]) + '</td></tr>');
+    h.push('<tr><td style="padding:0 24px 0 0;color:#555">' + esc(doc.year[0]) +
+      '</td><td style="padding:0;text-align:right;color:#555;white-space:nowrap">' + esc(doc.year[1]) + '</td></tr>');
+    h.push('</table>');
+    h.push('<p style="margin:14px 0 0;font-size:12px;color:#777">' +
+      doc.notes.map(esc).join('<br>') + '</p></div>');
+    var html = h.join("");
+
+    var btn = this;
+    function done(ok){
+      var was = T("t057","Copy for email");
+      btn.textContent = ok ? T("copied","Copied — paste into your email")
+                           : T("copyFail","Copy failed");
+      if (ok && window.__track) window.__track("copy");
+      setTimeout(function(){ btn.textContent = was; }, 2200);
+    }
+    function plainOnly(){
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ done(true); }, fallback);
+      } else { fallback(); }
+    }
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){
+      try {
+        navigator.clipboard.write([new ClipboardItem({
+          "text/html": new Blob([html], { type:"text/html" }),
+          "text/plain": new Blob([text], { type:"text/plain" })
+        })]).then(function(){ done(true); }, plainOnly);
+      } catch(e){ plainOnly(); }
+    } else { plainOnly(); }
+    function fallback(){
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch(e){}
+      document.body.removeChild(ta);
+      done(ok);
+    }
+  });
+
+  rebuildCcyOptions();
+  render();
+  fetchRates();
+
+  /* ============================================================
+     Usage tracking
+     Anonymous counts, so the team can see which calculators get used.
+     The payload carries the region, the event and two random ids kept in
+     this browser — never the volumes, prices or anything a customer typed.
+     ============================================================ */
+  (function(){
+    var URL = "https://script.google.com/macros/s/AKfycbz45ERWViNfVOAWMxIVZ2fWNN9pw22ldBNz0yJN26U3Y47lpVhevT3xLDZk7EmHTik/exec";
+    if (URL.indexOf("https://") !== 0) return;      // not configured: stay silent
+
+    function anonId(store, key){
+      try {
+        var v = store.getItem(key);
+        if (!v){
+          v = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+          store.setItem(key, v);
+        }
+        return v;
+      } catch(e){ return ""; }                      // private window, blocked storage
+    }
+    var visitor = anonId(window.localStorage, "wati-calc-visitor");
+    var session = anonId(window.sessionStorage, "wati-calc-session");
+
+    window.__track = function(event){
+      var body = JSON.stringify({
+        region: CONFIG.region,
+        event: event,
+        visitor: visitor,
+        session: session,
+        lang: LANG,
+        ccy: state.outCcy
+      });
+      try {
+        // A beacon so it still lands when the tab closes; text/plain keeps it a
+        // simple request, so Apps Script never sees a CORS preflight.
+        if (navigator.sendBeacon){
+          navigator.sendBeacon(URL, new Blob([body], { type: "text/plain;charset=utf-8" }));
+        } else {
+          fetch(URL, { method: "POST", mode: "no-cors", keepalive: true,
+            headers: { "Content-Type": "text/plain;charset=utf-8" }, body: body });
+        }
+      } catch(e){}                                   // tracking never breaks the page
+    };
+    window.__track("view");
+  })();
+})();
+</script>
+</body>
+
