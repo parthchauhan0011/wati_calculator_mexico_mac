@@ -431,6 +431,8 @@
   .p-facts{margin:0;padding:13px 0 0;list-style:none;font-size:.87rem;border-top:1px solid var(--hair-2)}
   .p-facts li{padding:4px 0;display:flex;gap:8px}
   .p-facts li::before{content:"\00b7";font-weight:700;flex:none}
+  .buildstamp{margin:18px 0 0;font-size:11px;color:var(--muted);
+    font-variant-numeric:tabular-nums;opacity:.75}
   .macbox{margin-top:14px;display:flex;flex-direction:column;gap:7px}
   .macrow{display:flex;align-items:center;gap:10px;font-size:.84rem}
   .macrow .mp{flex:none;width:84px;font-weight:650;color:var(--muted)}
@@ -826,6 +828,7 @@
 <li><span data-i18n="t069">Volume discounts above roughly a million messages a month aren't modelled. Also excluded: custom onboarding and setup, technical account management and professional services.</span> <a class="ao-link" data-i18n="onbLink" href="https://support.wati.io/en/articles/11462987-service-add-on-dedicated-onboarding" rel="noopener" target="_blank">Dedicated onboarding</a></li>
 <li data-i18n="t071">Exchange rates come from Frankfurter, falling back to Exchange Rate API. Both publish once a day, so the rate is a daily reference rate, not a dealing rate. Wati invoices in <b data-i18n-skip="1">MXN</b>; your bank’s rate on the day will differ slightly.</li>
 </ol>
+<p class="buildstamp" id="buildStamp" data-i18n-skip>Build 2026-11-25 - bb0125f</p>
 </div>
 <div aria-hidden="true" class="mbar">
 <span class="l" data-i18n="t070">Estimated monthly<b id="mbPlan">Wati Pro</b></span>
